@@ -4,10 +4,26 @@ import com.example.promonade.dto.request.promotiondtos.PromotionRequest;
 import com.example.promonade.models.Criteria;
 import com.example.promonade.models.Promotion;
 import com.example.promonade.models.User;
+import com.example.promonade.repositories.UserRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 
+@AllArgsConstructor
+@Component
 public class PromotionTransformer {
-    public static Promotion promotionRequestToPromotion(PromotionRequest promotionRequest, User createdBy){
+
+    private final UserRepository userRepository;
+
+    public Promotion promotionRequestToPromotion(PromotionRequest promotionRequest){
+        Optional<User> optionalCreatedBy = userRepository.findByEmail(promotionRequest.getUserEmail());
+        if(optionalCreatedBy.isEmpty()){
+            throw new RuntimeException("User with the specified Mail is not found!");
+        }
+        User createdBy = optionalCreatedBy.get();
+
         return Promotion.builder()
                 .promotionType(promotionRequest.getPromotionType())
                 .name(promotionRequest.getName())

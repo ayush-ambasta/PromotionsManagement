@@ -13,6 +13,7 @@ public class UserTransformer {
                 .password1(encoder.encode(signupRequest.getPassword()))
                 .role(signupRequest.getRole())
                 .email(signupRequest.getEmail())
+                .team((signupRequest.getTeam()))
                 .build();
     }
 
@@ -22,6 +23,7 @@ public class UserTransformer {
                 .email(user.getEmail())
                 .id(user.getUserId())
                 .role(user.getRole())
+                .team(user.getTeam())
                 .build();
     }
 }

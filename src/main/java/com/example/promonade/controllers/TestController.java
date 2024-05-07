@@ -15,20 +15,20 @@ public class TestController {
     }
 
     @GetMapping("/user")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
     public String userAccess() {
         return "User Content.";
     }
 
 
     @GetMapping("/owner")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('OWNER')")
     public String ownerAccess() {
         return "Owner Content.";
     }
 
     @GetMapping("/manager")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public String managerAccess() {
         return "manager Content.";
     }

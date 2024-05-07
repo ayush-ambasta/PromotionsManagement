@@ -2,6 +2,7 @@ package com.example.promonade.dto.request.userdtos;
 
 import com.example.promonade.enums.customerEnums.Gender;
 import com.example.promonade.enums.userEnums.ERole;
+import com.example.promonade.enums.userEnums.Team;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -24,4 +25,6 @@ public class SignupRequest {
     String email;
 
     ERole role;
+
+    Team team;
 }

@@ -4,6 +4,8 @@ import com.example.promonade.dto.request.userdtos.LoginRequest;
 import com.example.promonade.dto.request.userdtos.SignupRequest;
 import com.example.promonade.dto.response.userdtos.JwtResponse;
 import com.example.promonade.dto.response.userdtos.SignupResponse;
+import com.example.promonade.exceptions.userExceptions.RoleNotExistsException;
+import com.example.promonade.exceptions.userExceptions.UserExistsException;
 import com.example.promonade.models.User;
 import com.example.promonade.repositories.UserRepository;
 import com.example.promonade.security.jwt.JwtUtils;
@@ -53,15 +55,15 @@ public class UserService {
 
     public SignupResponse registerUser(SignupRequest signUpRequest){
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            throw new RuntimeException("Username is already taken!");
+            throw new UserExistsException("Username is already taken!");
         }
 
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new RuntimeException("Email is already in use!");
+            throw new UserExistsException("Email is already in use!");
         }
 
         if (signUpRequest.getRole() == null) {
-            throw new RuntimeException("Role doesn't exist!");
+            throw new RoleNotExistsException("Role doesn't exist!");
         }
 
         // Create new user's account

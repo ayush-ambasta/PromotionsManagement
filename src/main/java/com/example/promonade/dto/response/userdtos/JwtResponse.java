@@ -1,6 +1,7 @@
 package com.example.promonade.dto.response.userdtos;
 
 import com.example.promonade.enums.userEnums.ERole;
+import com.example.promonade.enums.userEnums.Team;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -19,6 +20,7 @@ public class JwtResponse {
     String username;
     String email;
     ERole role;
+    Team team;
 
     public JwtResponse(String accessToken, Integer id, String username, String email, String role) {
         this.accessToken = accessToken;

@@ -1,6 +1,7 @@
 package com.example.promonade.dto.response.userdtos;
 
 import com.example.promonade.enums.userEnums.ERole;
+import com.example.promonade.enums.userEnums.Team;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,4 +19,5 @@ public class SignupResponse {
     String username;
     String email;
     ERole role;
+    Team team;
 }
