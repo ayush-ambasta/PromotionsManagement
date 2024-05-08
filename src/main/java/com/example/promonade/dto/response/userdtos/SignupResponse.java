@@ -5,6 +5,7 @@ import com.example.promonade.enums.userEnums.Team;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -20,4 +21,6 @@ public class SignupResponse {
     String email;
     ERole role;
     Team team;
+    String name;
+    Date createdAt;
 }

@@ -5,6 +5,7 @@ import com.example.promonade.dto.request.userdtos.SignupRequest;
 import com.example.promonade.dto.response.userdtos.JwtResponse;
 import com.example.promonade.dto.response.userdtos.SignupResponse;
 import com.example.promonade.exceptions.userExceptions.RoleNotExistsException;
+import com.example.promonade.exceptions.userExceptions.TeamNotExistsException;
 import com.example.promonade.exceptions.userExceptions.UserExistsException;
 import com.example.promonade.models.User;
 import com.example.promonade.repositories.UserRepository;
@@ -64,6 +65,10 @@ public class UserService {
 
         if (signUpRequest.getRole() == null) {
             throw new RoleNotExistsException("Role doesn't exist!");
+        }
+
+        if (signUpRequest.getTeam() == null) {
+            throw new TeamNotExistsException("Team doesn't exist!");
         }
 
         // Create new user's account

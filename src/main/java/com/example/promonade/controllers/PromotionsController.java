@@ -6,6 +6,7 @@ import com.example.promonade.service.PromotionsService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,14 +18,15 @@ public class PromotionsController {
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> createPromotion(@RequestBody PromotionRequest promotionRequest){
-        return ResponseEntity.ok(promotionsService.createPromotion(promotionRequest));
+    public ResponseEntity<?> createPromotion(@RequestHeader("Authorization") String headerAuth,
+                                             @RequestBody PromotionRequest promotionRequest){
+        return ResponseEntity.ok(promotionsService.createPromotion(promotionRequest, headerAuth));
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> deletePromotion(@PathVariable("id") int id){
-        return ResponseEntity.ok(promotionsService.deletePromotion(id));
+    public ResponseEntity<?> deletePromotion(@PathVariable("id") int id, @RequestHeader("Authorization") String headerAuth){
+        return ResponseEntity.ok(promotionsService.deletePromotion(id, headerAuth));
     }
 
     @GetMapping()
@@ -39,23 +41,29 @@ public class PromotionsController {
         return ResponseEntity.ok(promotionsService.getPromotion(id));
     }
 
-    //Have to implement
+    //Have to implement -- scheduling, activate parameter
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> editPromotion(@PathVariable int id){
-        return ResponseEntity.ok("Not implemented!");
+    public ResponseEntity<?> editPromotion(@PathVariable int id, @RequestBody PromotionRequest promotionRequest){
+        return ResponseEntity.ok(promotionsService.editPromotion(id, promotionRequest));
     }
 
-    @GetMapping("/get-non-approved-per-team")
+    @GetMapping("/get-non-approved-user-team")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> getNonApprovedPromotions(@RequestParam("team") Team team){
-        return ResponseEntity.ok("Not implemented!");
+    public ResponseEntity<?> getNonApprovedPromotionsForUserTeam(@RequestHeader("Authorization") String headerAuth){
+        return ResponseEntity.ok(promotionsService.getNonApprovedPromotionsForUserTeam(headerAuth));
+    }
+
+    @GetMapping("/get-approved-user-team")
+    @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
+    public ResponseEntity<?> getApprovedPromotionsForUserTeam(@RequestHeader("Authorization") String headerAuth){
+        return ResponseEntity.ok(promotionsService.getApprovedPromotionsForUserTeam(headerAuth));
     }
 
     @PostMapping("/approve-promotion")
     @PreAuthorize("hasAuthority('OWNER')")
-    public ResponseEntity<?> approvePromotion(@RequestParam("team") Team team){
-        return ResponseEntity.ok("Not implemented!");
+    public ResponseEntity<?> approvePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth){
+        return ResponseEntity.ok(promotionsService.approvePromotion(id, headerAuth));
     }
 }

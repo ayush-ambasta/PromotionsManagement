@@ -5,6 +5,7 @@ import com.example.promonade.enums.promotionEnums.PromotionType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 
@@ -33,7 +34,7 @@ public class Promotion {
 
     Date validTill;
 
-    boolean approved;
+    Boolean approved;
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn()
@@ -42,4 +43,7 @@ public class Promotion {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn
     Criteria criteria;
+
+    @CreationTimestamp
+    Date createdAt;
 }

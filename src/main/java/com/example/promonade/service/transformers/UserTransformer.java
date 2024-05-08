@@ -12,6 +12,7 @@ public class UserTransformer {
                 .username(signupRequest.getUsername())
                 .password1(encoder.encode(signupRequest.getPassword()))
                 .role(signupRequest.getRole())
+                .name(signupRequest.getName())
                 .email(signupRequest.getEmail())
                 .team((signupRequest.getTeam()))
                 .build();
@@ -24,6 +25,8 @@ public class UserTransformer {
                 .id(user.getUserId())
                 .role(user.getRole())
                 .team(user.getTeam())
+                .name(user.getName())
+                .createdAt(user.getCreateAt())
                 .build();
     }
 }

@@ -27,4 +27,6 @@ public class SignupRequest {
     ERole role;
 
     Team team;
+
+    String name;
 }

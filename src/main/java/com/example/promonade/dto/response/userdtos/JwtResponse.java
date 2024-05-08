@@ -20,7 +20,6 @@ public class JwtResponse {
     String username;
     String email;
     ERole role;
-    Team team;
 
     public JwtResponse(String accessToken, Integer id, String username, String email, String role) {
         this.accessToken = accessToken;

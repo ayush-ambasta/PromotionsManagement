@@ -26,6 +26,4 @@ public class PromotionRequest {
     Date validTill;
 
     CriteriaRequest criteria;
-
-    String userEmail;
 }
