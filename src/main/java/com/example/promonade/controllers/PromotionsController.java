@@ -1,12 +1,10 @@
 package com.example.promonade.controllers;
 
 import com.example.promonade.dto.request.promotiondtos.PromotionRequest;
-import com.example.promonade.enums.userEnums.Team;
 import com.example.promonade.service.PromotionsService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,8 +39,6 @@ public class PromotionsController {
         return ResponseEntity.ok(promotionsService.getPromotion(id));
     }
 
-    //Have to implement -- scheduling, activate parameter
-
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
     public ResponseEntity<?> editPromotion(@PathVariable int id, @RequestBody PromotionRequest promotionRequest){
@@ -66,4 +62,22 @@ public class PromotionsController {
     public ResponseEntity<?> approvePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth){
         return ResponseEntity.ok(promotionsService.approvePromotion(id, headerAuth));
     }
+
+    @PostMapping("/disapprove-promotion")
+    @PreAuthorize("hasAuthority('OWNER')")
+    public ResponseEntity<?> disapprovePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth){
+        return ResponseEntity.ok(promotionsService.disapprovePromotion(id, headerAuth));
+    }
+
+    @PostMapping("/deactivate")
+    @PreAuthorize("hasAuthority('OWNER')")
+    public ResponseEntity<?> deactivatePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth){
+        return ResponseEntity.ok(promotionsService.deactivatePromotion(id, headerAuth));
+    }
+
+//    @PostMapping("/schedule-promotion/{id}")
+//    @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
+//    public ResponseEntity<?> schedulePromotion(@PathVariable("id") int id){
+//        return ResponseEntity.ok(promotionsService.schedulePromotion(id));
+//    }
 }

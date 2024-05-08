@@ -13,8 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-@AllArgsConstructor
-@Component
+
 public class PromotionTransformer {
 
     public static Promotion promotionRequestToPromotion(PromotionRequest promotionRequest, User createdBy){

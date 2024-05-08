@@ -4,33 +4,39 @@ import com.example.promonade.dto.request.promotiondtos.CriteriaRequest;
 import com.example.promonade.dto.request.promotiondtos.PromotionRequest;
 import com.example.promonade.dto.response.UpdationResponse;
 import com.example.promonade.enums.promotionEnums.PromotionCategory;
-import com.example.promonade.enums.promotionEnums.PromotionType;
-import com.example.promonade.enums.userEnums.ERole;
 import com.example.promonade.enums.userEnums.Team;
 import com.example.promonade.exceptions.promotionExceptions.PromotionIncompleteException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
 import com.example.promonade.exceptions.userExceptions.TeamNotAuthorisedException;
-import com.example.promonade.exceptions.userExceptions.UserNotFoundException;
 import com.example.promonade.models.Criteria;
 import com.example.promonade.models.Promotion;
 import com.example.promonade.models.User;
 import com.example.promonade.repositories.PromotionRepository;
-import com.example.promonade.repositories.UserRepository;
-import com.example.promonade.security.jwt.JwtUtils;
+import com.example.promonade.scheduler.ActivatePromotionBean;
+import com.example.promonade.scheduler.DeactivatePromotionBean;
+import com.example.promonade.service.scheduledTasks.ActivatePromotion;
+import com.example.promonade.service.scheduledTasks.DeactivatePromotion;
+import com.example.promonade.service.scheduledTasks.PromotionAct;
 import com.example.promonade.service.transformers.PromotionTransformer;
 import com.example.promonade.service.utils.GeneralUtils;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ScheduledFuture;
 
 @Service
 @AllArgsConstructor
 public class PromotionsService {
     private final PromotionRepository promotionRepository;
     private final GeneralUtils generalUtils;
+    private final TaskScheduler taskScheduler;
+    private final ActivatePromotionBean activatePromotionBean;
+    private final DeactivatePromotionBean deactivatePromotionBean;
+
+    Map<Integer, ScheduledFuture<?>> jobsMap = new HashMap<>();
 
     public Promotion createPromotion(PromotionRequest promotionRequest, String authToken){
         if(promotionRequest.getCategory()==null){
@@ -156,14 +162,90 @@ public class PromotionsService {
         }
 
         promotion.setApproved(true);
+
+        schedulePromotion(promotion, promotion.getValidFrom(), true);
+        schedulePromotion(promotion, promotion.getValidTill(), false);
+
         Promotion promotion1 = promotionRepository.save(promotion);
-        String message = "Promotion Not approved";
-        boolean success = false;
-        if(promotion1.getApproved()){
-            message = String.format("Promotion %s with id %d is successfully approved", promotion1.getName(), promotion1.getId());
-            success = true;
+
+        String message = String.format("Promotion %s with id %d is successfully approved", promotion1.getName(), promotion1.getId());
+        boolean success = true;
+        return new UpdationResponse(message, success);
+    }
+
+    public UpdationResponse disapprovePromotion(int id, String headerAuth) {
+        Optional<Promotion> promotionOptional = promotionRepository.findById(id);
+        if(promotionOptional.isEmpty()){
+            throw new PromotionNotFoundException("Promotion with id " + id + " does not exist");
         }
-        System.out.println(promotion1);
+        Promotion promotion = promotionOptional.get();
+        User user = generalUtils.getUserFromAuthToken(headerAuth);
+
+        String userTeam = user.getTeam().toString();
+        String promoCat = promotion.getCategory().toString();
+
+        //when team does not match the promo type
+        if(!userTeam.substring(0, userTeam.length()-11).equals(promoCat)){
+            throw new TeamNotAuthorisedException(String.format("The Owner of team %s cannot disapprove %s promotion type!", userTeam, promoCat));
+        }
+
+        promotion.setApproved(false);
+        Promotion promotion1 = promotionRepository.save(promotion);
+
+        String message = String.format("Promotion %s with id %d is successfully disapproved", promotion1.getName(), promotion1.getId());
+        boolean success = true;
+        return new UpdationResponse(message, success);
+    }
+
+    public void schedulePromotion(Promotion promotion, Date date, boolean promotionStart){
+        ScheduledFuture<?> scheduledTask;
+        int jobId = promotionStart? promotion.getId()*2: (promotion.getId()*2)+1;
+        String cronExpression = generalUtils.convertToCronExpression(date);
+
+        System.out.println("Scheduling task with job id: " + jobId + " and cron expression: " + cronExpression + " and promotionStart: "+ promotionStart);
+
+        if(promotionStart){
+            PromotionAct promotionAct = new ActivatePromotion(cronExpression, promotion, promotionRepository);
+            activatePromotionBean.setPromotionAct(promotionAct);
+            scheduledTask = taskScheduler.schedule(activatePromotionBean, new CronTrigger(cronExpression, TimeZone.getTimeZone("Asia/Kolkata")));
+        } else {
+            PromotionAct promotionAct = new DeactivatePromotion(cronExpression, promotion, promotionRepository);
+            deactivatePromotionBean.setPromotionAct(promotionAct);
+            scheduledTask = taskScheduler.schedule(deactivatePromotionBean, new CronTrigger(cronExpression, TimeZone.getTimeZone("Asia/Kolkata")));
+        }
+
+        jobsMap.put(jobId, scheduledTask);
+    }
+
+    public void removeScheduledPromotion(int jobId){
+        ScheduledFuture<?> scheduledTask = jobsMap.get(jobId);
+        if(scheduledTask != null) {
+            scheduledTask.cancel(true);
+            jobsMap.put(jobId, null);
+        }
+    }
+
+    public UpdationResponse deactivatePromotion(int id, String headerAuth) {
+        Optional<Promotion> promotionOptional = promotionRepository.findById(id);
+        if(promotionOptional.isEmpty()){
+            throw new PromotionNotFoundException("Promotion with id " + id + " does not exist");
+        }
+        Promotion promotion = promotionOptional.get();
+        User user = generalUtils.getUserFromAuthToken(headerAuth);
+
+        String userTeam = user.getTeam().toString();
+        String promoCat = promotion.getCategory().toString();
+
+        //when team does not match the promo type
+        if(!userTeam.substring(0, userTeam.length()-11).equals(promoCat)){
+            throw new TeamNotAuthorisedException(String.format("The Owner of team %s cannot deactivate %s promotion type!", userTeam, promoCat));
+        }
+
+        promotion.setActive(false);
+        Promotion promotion1 = promotionRepository.save(promotion);
+
+        String message = String.format("Promotion %s with id %d is successfully deactivated", promotion1.getName(), promotion1.getId());
+        boolean success = true;
         return new UpdationResponse(message, success);
     }
 }
