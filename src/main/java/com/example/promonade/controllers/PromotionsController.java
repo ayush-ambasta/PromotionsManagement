@@ -70,7 +70,7 @@ public class PromotionsController {
     }
 
     @PostMapping("/deactivate")
-    @PreAuthorize("hasAuthority('OWNER')")
+    @PreAuthorize("hasAuthority('OWNER') or hasAuthority('OWNER')")
     public ResponseEntity<?> deactivatePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth){
         return ResponseEntity.ok(promotionsService.deactivatePromotion(id, headerAuth));
     }
