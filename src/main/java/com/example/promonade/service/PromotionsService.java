@@ -4,6 +4,7 @@ import com.example.promonade.dto.request.promotiondtos.CriteriaRequest;
 import com.example.promonade.dto.request.promotiondtos.PromotionRequest;
 import com.example.promonade.dto.response.UpdationResponse;
 import com.example.promonade.enums.promotionEnums.PromotionCategory;
+import com.example.promonade.enums.promotionEnums.PromotionScheduleAction;
 import com.example.promonade.enums.userEnums.Team;
 import com.example.promonade.exceptions.promotionExceptions.PromotionIncompleteException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
@@ -12,11 +13,9 @@ import com.example.promonade.models.Criteria;
 import com.example.promonade.models.Promotion;
 import com.example.promonade.models.User;
 import com.example.promonade.repositories.PromotionRepository;
-import com.example.promonade.scheduler.ActivatePromotionBean;
-import com.example.promonade.scheduler.DeactivatePromotionBean;
-import com.example.promonade.service.scheduledTasks.ActivatePromotion;
-import com.example.promonade.service.scheduledTasks.DeactivatePromotion;
-import com.example.promonade.service.scheduledTasks.PromotionAct;
+import com.example.promonade.scheduler.ActivatePromotion;
+import com.example.promonade.scheduler.DeactivatePromotion;
+import com.example.promonade.scheduler.ScheduleTask;
 import com.example.promonade.service.transformers.PromotionTransformer;
 import com.example.promonade.service.utils.GeneralUtils;
 import lombok.AllArgsConstructor;
@@ -33,8 +32,6 @@ public class PromotionsService {
     private final PromotionRepository promotionRepository;
     private final GeneralUtils generalUtils;
     private final TaskScheduler taskScheduler;
-    private final ActivatePromotionBean activatePromotionBean;
-    private final DeactivatePromotionBean deactivatePromotionBean;
 
     Map<Integer, ScheduledFuture<?>> jobsMap = new HashMap<>();
 
@@ -163,8 +160,8 @@ public class PromotionsService {
 
         promotion.setApproved(true);
 
-        schedulePromotion(promotion, promotion.getValidFrom(), true);
-        schedulePromotion(promotion, promotion.getValidTill(), false);
+        schedulePromotion(promotion, PromotionScheduleAction.ACTIVATEPROMOTION);
+        schedulePromotion(promotion, PromotionScheduleAction.DEACTIVATEPROMOTION);
 
         Promotion promotion1 = promotionRepository.save(promotion);
 
@@ -197,22 +194,19 @@ public class PromotionsService {
         return new UpdationResponse(message, success);
     }
 
-    public void schedulePromotion(Promotion promotion, Date date, boolean promotionStart){
+    public void schedulePromotion(Promotion promotion, PromotionScheduleAction action){
         ScheduledFuture<?> scheduledTask;
-        int jobId = promotionStart? promotion.getId()*2: (promotion.getId()*2)+1;
+        int jobId = action.equals(PromotionScheduleAction.ACTIVATEPROMOTION)? promotion.getId()*2: (promotion.getId()*2)+1;
+        Date date = action.equals(PromotionScheduleAction.ACTIVATEPROMOTION)? promotion.getValidFrom(): promotion.getValidTill();
         String cronExpression = generalUtils.convertToCronExpression(date);
 
-        System.out.println("Scheduling task with job id: " + jobId + " and cron expression: " + cronExpression + " and promotionStart: "+ promotionStart);
+        System.out.println("Scheduling task with job id: " + jobId + " and cron expression: " + cronExpression + " and promotionStart: "+ action.toString());
 
-        if(promotionStart){
-            PromotionAct promotionAct = new ActivatePromotion(cronExpression, promotion, promotionRepository);
-            activatePromotionBean.setPromotionAct(promotionAct);
-            scheduledTask = taskScheduler.schedule(activatePromotionBean, new CronTrigger(cronExpression, TimeZone.getTimeZone("Asia/Kolkata")));
-        } else {
-            PromotionAct promotionAct = new DeactivatePromotion(cronExpression, promotion, promotionRepository);
-            deactivatePromotionBean.setPromotionAct(promotionAct);
-            scheduledTask = taskScheduler.schedule(deactivatePromotionBean, new CronTrigger(cronExpression, TimeZone.getTimeZone("Asia/Kolkata")));
-        }
+        ScheduleTask scheduleTask = action.equals(PromotionScheduleAction.ACTIVATEPROMOTION)?
+                new ActivatePromotion(action, promotion, promotionRepository):
+                new DeactivatePromotion(action, promotion, promotionRepository);
+
+        scheduledTask = taskScheduler.schedule((Runnable) scheduleTask, new CronTrigger(cronExpression, TimeZone.getTimeZone("Asia/Kolkata")));
 
         jobsMap.put(jobId, scheduledTask);
     }
@@ -247,5 +241,10 @@ public class PromotionsService {
         String message = String.format("Promotion %s with id %d is successfully deactivated", promotion1.getName(), promotion1.getId());
         boolean success = true;
         return new UpdationResponse(message, success);
+    }
+
+    public UpdationResponse deleteAllPromotions() {
+        promotionRepository.deleteAll();
+        return new UpdationResponse("All promotions deleted successfully", true);
     }
 }

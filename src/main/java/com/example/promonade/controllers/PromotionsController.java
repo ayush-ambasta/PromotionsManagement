@@ -17,67 +17,69 @@ public class PromotionsController {
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
     public ResponseEntity<?> createPromotion(@RequestHeader("Authorization") String headerAuth,
-                                             @RequestBody PromotionRequest promotionRequest){
+                                             @RequestBody PromotionRequest promotionRequest) {
         return ResponseEntity.ok(promotionsService.createPromotion(promotionRequest, headerAuth));
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> deletePromotion(@PathVariable("id") int id, @RequestHeader("Authorization") String headerAuth){
+    public ResponseEntity<?> deletePromotion(@PathVariable("id") int id, @RequestHeader("Authorization") String headerAuth) {
         return ResponseEntity.ok(promotionsService.deletePromotion(id, headerAuth));
     }
 
     @GetMapping()
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> getAllPromotions(){
+    public ResponseEntity<?> getAllPromotions() {
         return ResponseEntity.ok(promotionsService.getAllPromotions());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> getPromotion(@PathVariable int id){
+    public ResponseEntity<?> getPromotion(@PathVariable int id) {
         return ResponseEntity.ok(promotionsService.getPromotion(id));
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> editPromotion(@PathVariable int id, @RequestBody PromotionRequest promotionRequest){
+    public ResponseEntity<?> editPromotion(@PathVariable int id, @RequestBody PromotionRequest promotionRequest) {
         return ResponseEntity.ok(promotionsService.editPromotion(id, promotionRequest));
     }
 
     @GetMapping("/get-non-approved-user-team")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> getNonApprovedPromotionsForUserTeam(@RequestHeader("Authorization") String headerAuth){
+    public ResponseEntity<?> getNonApprovedPromotionsForUserTeam(@RequestHeader("Authorization") String headerAuth) {
         return ResponseEntity.ok(promotionsService.getNonApprovedPromotionsForUserTeam(headerAuth));
     }
 
     @GetMapping("/get-approved-user-team")
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> getApprovedPromotionsForUserTeam(@RequestHeader("Authorization") String headerAuth){
+    public ResponseEntity<?> getApprovedPromotionsForUserTeam(@RequestHeader("Authorization") String headerAuth) {
         return ResponseEntity.ok(promotionsService.getApprovedPromotionsForUserTeam(headerAuth));
     }
 
     @PostMapping("/approve-promotion")
     @PreAuthorize("hasAuthority('OWNER')")
-    public ResponseEntity<?> approvePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth){
+    public ResponseEntity<?> approvePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth) {
         return ResponseEntity.ok(promotionsService.approvePromotion(id, headerAuth));
     }
 
     @PostMapping("/disapprove-promotion")
     @PreAuthorize("hasAuthority('OWNER')")
-    public ResponseEntity<?> disapprovePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth){
+    public ResponseEntity<?> disapprovePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth) {
         return ResponseEntity.ok(promotionsService.disapprovePromotion(id, headerAuth));
     }
 
     @PostMapping("/deactivate")
     @PreAuthorize("hasAuthority('OWNER') or hasAuthority('OWNER')")
-    public ResponseEntity<?> deactivatePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth){
+    public ResponseEntity<?> deactivatePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth) {
         return ResponseEntity.ok(promotionsService.deactivatePromotion(id, headerAuth));
     }
 
-//    @PostMapping("/schedule-promotion/{id}")
-//    @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
-//    public ResponseEntity<?> schedulePromotion(@PathVariable("id") int id){
-//        return ResponseEntity.ok(promotionsService.schedulePromotion(id));
-//    }
+    //Just for quick dev purpose
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
+    public ResponseEntity<?> deleteAllPromotions() {
+        return ResponseEntity.ok(promotionsService.deleteAllPromotions());
+    }
+
 }
