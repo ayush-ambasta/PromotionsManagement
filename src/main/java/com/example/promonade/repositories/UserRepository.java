@@ -1,9 +1,11 @@
 package com.example.promonade.repositories;
 
+import com.example.promonade.enums.userEnums.Team;
 import com.example.promonade.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     public Boolean existsByUsername(String username);
 
     public Boolean existsByEmail(String email);
+
+    public List<User> findByTeam(Team name);
 }
