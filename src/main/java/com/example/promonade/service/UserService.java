@@ -2,16 +2,21 @@ package com.example.promonade.service;
 
 import com.example.promonade.dto.request.userdtos.LoginRequest;
 import com.example.promonade.dto.request.userdtos.SignupRequest;
+import com.example.promonade.dto.response.UpdationResponse;
 import com.example.promonade.dto.response.userdtos.JwtResponse;
 import com.example.promonade.dto.response.userdtos.SignupResponse;
-import com.example.promonade.exceptions.userExceptions.RoleNotExistsException;
-import com.example.promonade.exceptions.userExceptions.TeamNotExistsException;
-import com.example.promonade.exceptions.userExceptions.UserExistsException;
+import com.example.promonade.dto.response.userdtos.UserResponse;
+import com.example.promonade.enums.userEnums.ERole;
+import com.example.promonade.enums.userEnums.Team;
+import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
+import com.example.promonade.exceptions.userExceptions.*;
+import com.example.promonade.models.Promotion;
 import com.example.promonade.models.User;
 import com.example.promonade.repositories.UserRepository;
 import com.example.promonade.security.jwt.JwtUtils;
 import com.example.promonade.security.service.UserDetailsImpl;
 import com.example.promonade.service.transformers.UserTransformer;
+import com.example.promonade.service.utils.GeneralUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +25,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +41,8 @@ public class UserService {
     private final PasswordEncoder encoder;
 
     private final JwtUtils jwtUtils;
+
+    private final GeneralUtils generalUtils;
 
     public JwtResponse authenticateUser(LoginRequest loginRequest){
         Authentication authentication = authenticationManager.authenticate(
@@ -62,7 +71,6 @@ public class UserService {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new UserExistsException("Email is already in use!");
         }
-
         if (signUpRequest.getRole() == null) {
             throw new RoleNotExistsException("Role doesn't exist!");
         }
@@ -78,5 +86,53 @@ public class UserService {
         userRepository.save(user);
 
         return UserTransformer.userToSignupResponse(user);
+    }
+
+    public List<UserResponse> getAllUsers() {
+        List<User> allUsers = userRepository.findAll();
+        List<UserResponse> userResponses = new ArrayList<>();
+
+        for (User user : allUsers) {
+            UserResponse userResponse = UserTransformer.UserToUserResposne(user);
+            userResponses.add(userResponse);
+        }
+
+        return userResponses;
+    }
+
+    public String deleteUser(String username,String authToken)  {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if(userOptional.isEmpty()){
+            throw new UserNotFoundException("User with username " + username + " does not exist");
+        }
+        User user = userOptional.get();
+        User owner = generalUtils.getUserFromAuthToken(authToken);
+        String ownerTeam = owner.getTeam().toString();
+        String userTeam = user.getTeam().toString();
+
+        if(user.getRole().equals(ERole.OWNER)){
+            throw new OwnerNotAuthorisedException("Owner cannot delete Owner");
+        }
+        //when team does not match
+        if(!userTeam.equals(ownerTeam)){
+            throw new TeamNotAuthorisedException(String.format("The owner team %s cannot delete %s user team!", ownerTeam, userTeam));
+        }
+        userRepository.delete(user);
+        return String.format("User with the username %s successfully deleted!",user.getUsername());
+
+    }
+
+    public List<UserResponse> getAllUserFromTeam(Team name) {
+
+        List<User> allUsers = userRepository.findByTeam(name);
+
+        List<UserResponse> userResponses = new ArrayList<>();
+
+        for (User user : allUsers) {
+            UserResponse userResponse = UserTransformer.UserToUserResposne(user);
+            userResponses.add(userResponse);
+        }
+
+        return userResponses;
     }
 }

@@ -3,10 +3,7 @@ package com.example.promonade.exceptions;
 import com.example.promonade.dto.response.MessageResponse;
 import com.example.promonade.exceptions.promotionExceptions.PromotionIncompleteException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
-import com.example.promonade.exceptions.userExceptions.RoleNotExistsException;
-import com.example.promonade.exceptions.userExceptions.TeamNotAuthorisedException;
-import com.example.promonade.exceptions.userExceptions.UserExistsException;
-import com.example.promonade.exceptions.userExceptions.UserNotFoundException;
+import com.example.promonade.exceptions.userExceptions.*;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +24,8 @@ public class GlobalExceptionHandler {
             PromotionNotFoundException.class,
             TeamNotAuthorisedException.class,
             TeamNotAuthorisedException.class,
-            UserNotFoundException.class
+            UserNotFoundException.class,
+            OwnerNotAuthorisedException.class
     })
     public final ResponseEntity<?> handeException(RuntimeException ex, WebRequest request){
         LOGGER.error("Handling " + ex.getClass().getSimpleName() + " due to " + ex.getMessage());

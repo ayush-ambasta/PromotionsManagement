@@ -2,6 +2,7 @@ package com.example.promonade.service.transformers;
 
 import com.example.promonade.dto.request.userdtos.SignupRequest;
 import com.example.promonade.dto.response.userdtos.SignupResponse;
+import com.example.promonade.dto.response.userdtos.UserResponse;
 import com.example.promonade.models.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -27,6 +28,16 @@ public class UserTransformer {
                 .team(user.getTeam())
                 .name(user.getName())
                 .createdAt(user.getCreateAt())
+                .build();
+    }
+
+    public static UserResponse UserToUserResposne(User user) {
+        return UserResponse.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .name(user.getName())
+                .role(user.getRole())
+                .team(user.getTeam())
                 .build();
     }
 }
