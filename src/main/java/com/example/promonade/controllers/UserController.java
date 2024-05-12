@@ -17,7 +17,10 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllUsers(){
+
+    @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
+    public ResponseEntity<?> getAllUsers() {
+
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -28,8 +31,26 @@ public class UserController {
         return ResponseEntity.ok(userService.deleteUser(username,headerAuth));
     }
 
-    @GetMapping("/team")
-    public ResponseEntity<?>getAllUserFromTeam(@RequestParam("name") Team name) {
-        return ResponseEntity.ok(userService.getAllUserFromTeam(name));
+
+    @GetMapping("/current-team-users")
+    @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
+    public ResponseEntity<?>getAllUserFromTeam(@RequestHeader("Authorization") String headerAuth) {
+        return ResponseEntity.ok(userService.getUsersFromUserTeam(headerAuth));
+    }
+
+//    below endpoints are for development purpose
+
+    @DeleteMapping("/delete-noauth/{username}")
+    @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
+    public ResponseEntity<?> deleteUserNoAuth(@PathVariable("username") String username){
+        return ResponseEntity.ok(userService.deleteUserNoAuth(username));
+    }
+
+
+    @GetMapping("/team-users")
+    @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
+    public ResponseEntity<?>getAllUserFromTeam(@RequestParam("team") Team team) {
+        return ResponseEntity.ok(userService.getAllUserFromTeam(team));
+
     }
 }

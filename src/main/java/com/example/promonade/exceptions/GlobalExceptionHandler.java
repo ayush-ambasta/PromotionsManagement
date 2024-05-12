@@ -4,10 +4,10 @@ import com.example.promonade.dto.response.MessageResponse;
 import com.example.promonade.exceptions.promotionExceptions.PromotionIncompleteException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
 import com.example.promonade.exceptions.userExceptions.*;
-import jakarta.annotation.Nullable;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,9 +23,11 @@ public class GlobalExceptionHandler {
             UserExistsException.class,
             PromotionNotFoundException.class,
             TeamNotAuthorisedException.class,
-            TeamNotAuthorisedException.class,
+
+            TeamNotExistsException.class,
             UserNotFoundException.class,
-            OwnerNotAuthorisedException.class
+            UserNotAuthorisedException.class
+
     })
     public final ResponseEntity<?> handeException(RuntimeException ex, WebRequest request){
         LOGGER.error("Handling " + ex.getClass().getSimpleName() + " due to " + ex.getMessage());

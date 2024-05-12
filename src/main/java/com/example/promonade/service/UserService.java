@@ -8,9 +8,9 @@ import com.example.promonade.dto.response.userdtos.SignupResponse;
 import com.example.promonade.dto.response.userdtos.UserResponse;
 import com.example.promonade.enums.userEnums.ERole;
 import com.example.promonade.enums.userEnums.Team;
-import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
+
 import com.example.promonade.exceptions.userExceptions.*;
-import com.example.promonade.models.Promotion;
+
 import com.example.promonade.models.User;
 import com.example.promonade.repositories.UserRepository;
 import com.example.promonade.security.jwt.JwtUtils;
@@ -93,14 +93,18 @@ public class UserService {
         List<UserResponse> userResponses = new ArrayList<>();
 
         for (User user : allUsers) {
-            UserResponse userResponse = UserTransformer.UserToUserResposne(user);
+
+            UserResponse userResponse = UserTransformer.UserToUserResponse(user);
+
             userResponses.add(userResponse);
         }
 
         return userResponses;
     }
 
-    public String deleteUser(String username,String authToken)  {
+
+    public UpdationResponse deleteUser(String username,String authToken)  {
+
         Optional<User> userOptional = userRepository.findByUsername(username);
         if(userOptional.isEmpty()){
             throw new UserNotFoundException("User with username " + username + " does not exist");
@@ -111,28 +115,48 @@ public class UserService {
         String userTeam = user.getTeam().toString();
 
         if(user.getRole().equals(ERole.OWNER)){
-            throw new OwnerNotAuthorisedException("Owner cannot delete Owner");
+
+            throw new UserNotAuthorisedException("User cannot delete another Owner");
+
         }
         //when team does not match
         if(!userTeam.equals(ownerTeam)){
             throw new TeamNotAuthorisedException(String.format("The owner team %s cannot delete %s user team!", ownerTeam, userTeam));
         }
         userRepository.delete(user);
-        return String.format("User with the username %s successfully deleted!",user.getUsername());
+
+        return new UpdationResponse(String.format("Successfully deleted user %s", username), true);
 
     }
 
-    public List<UserResponse> getAllUserFromTeam(Team name) {
+    public List<UserResponse> getAllUserFromTeam(Team team) {
 
-        List<User> allUsers = userRepository.findByTeam(name);
+        List<User> allUsers = userRepository.findByTeam(team);
 
-        List<UserResponse> userResponses = new ArrayList<>();
+        return allUsers.stream()
+                .map(UserTransformer::UserToUserResponse)
+                .collect(Collectors.toList());
+    }
 
-        for (User user : allUsers) {
-            UserResponse userResponse = UserTransformer.UserToUserResposne(user);
-            userResponses.add(userResponse);
+    public UpdationResponse deleteUserNoAuth(String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if(userOptional.isEmpty()){
+            throw new UserNotFoundException("User with username " + username + " does not exist");
         }
+        User user = userOptional.get();
+        userRepository.delete(user);
+        return new UpdationResponse(String.format("Successfully deleted user %s", username), true);
+    }
 
-        return userResponses;
+    public List<UserResponse> getUsersFromUserTeam(String headerAuth) {
+        User user = generalUtils.getUserFromAuthToken(headerAuth);
+        Team team = user.getTeam();
+
+        List<User> allUsers = userRepository.findByTeam(team);
+
+        return allUsers.stream()
+                .map(UserTransformer::UserToUserResponse)
+                .collect(Collectors.toList());
+
     }
 }
