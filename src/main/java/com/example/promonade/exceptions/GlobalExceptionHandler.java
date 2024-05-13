@@ -5,6 +5,7 @@ import com.example.promonade.exceptions.productServiceExceptions.ProductIncomple
 import com.example.promonade.exceptions.productServiceExceptions.ProductNotFoundException;
 import com.example.promonade.exceptions.productServiceExceptions.ServiceIncompleteException;
 import com.example.promonade.exceptions.productServiceExceptions.ServiceNotFoundException;
+import com.example.promonade.exceptions.customerExceptions.CustomerNotFoundException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionIncompleteException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
 import com.example.promonade.exceptions.userExceptions.*;
@@ -31,7 +32,8 @@ public class GlobalExceptionHandler {
             ProductIncompleteException.class,
             ProductNotFoundException.class,
             ServiceIncompleteException.class,
-            ServiceNotFoundException.class
+            ServiceNotFoundException.class,
+            CustomerNotFoundException.class
     })
     public final ResponseEntity<?> handeException(RuntimeException ex, WebRequest request){
         LOGGER.error("Handling " + ex.getClass().getSimpleName() + " due to " + ex.getMessage());
