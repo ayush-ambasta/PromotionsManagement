@@ -3,12 +3,17 @@ package com.example.promonade.models;
 // Product.java
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.util.Date;
 
 @Setter
 @Getter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "products")
 public class Product {
 
@@ -18,16 +23,9 @@ public class Product {
 
     private String name;
     private String description;
-    private double price;
+    private Double price;
 
-    // Constructors, getters, and setters
-    public Product() {
-    }
-
-    public Product(String name, String description, double price) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-    }
+    @CreationTimestamp
+    private Date createdAt;
 
 }

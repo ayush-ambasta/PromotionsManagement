@@ -1,9 +1,11 @@
 package com.example.promonade.controllers;
 
 
-import com.example.promonade.dto.response.ServiceResponseDTO;
+import com.example.promonade.dto.request.productservicedtos.ServiceRequest;
+import com.example.promonade.models.Product;
 import com.example.promonade.models.Service;
 import com.example.promonade.service.ServiceService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,31 +13,35 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/services")
 public class ServiceController {
 
-    @Autowired
-    private ServiceService serviceService;
+    private final ServiceService serviceService;
 
     @PostMapping
-    public ResponseEntity<com.example.promonade.dto.response.ServiceResponseDTO> addService(@RequestBody com.example.promonade.dto.response.ServiceResponseDTO serviceRequestDTO) {
-        Service service = new Service(serviceRequestDTO.getName(), serviceRequestDTO.getDescription(), serviceRequestDTO.getPrice());
-        Service addedService = serviceService.addService(service);
-        com.example.promonade.dto.response.ServiceResponseDTO responseDTO = new com.example.promonade.dto.response.ServiceResponseDTO(addedService.getId(), addedService.getName(), addedService.getDescription(), addedService.getPrice());
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    public ResponseEntity<Service> addService(@RequestBody ServiceRequest serviceRequest) {
+        return ResponseEntity.ok(serviceService.addService(serviceRequest));
     }
 
     @DeleteMapping("/{serviceId}")
-    public ResponseEntity<Void> deleteService(@PathVariable Long serviceId) {
-        serviceService.deleteService(serviceId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<?> deleteService(@PathVariable("serviceId") int serviceId) {
+        return ResponseEntity.ok(serviceService.deleteService(serviceId));
     }
 
     @PutMapping("/{serviceId}")
-    public ResponseEntity<com.example.promonade.dto.response.ServiceResponseDTO> updateService(@PathVariable Long serviceId, @RequestBody com.example.promonade.dto.response.ServiceResponseDTO serviceRequestDTO) {
-        Service service = new Service(serviceRequestDTO.getName(), serviceRequestDTO.getDescription(), serviceRequestDTO.getPrice());
-        ServiceResponseDTO updatedService = serviceService.updateService(serviceId, service);
-        com.example.promonade.dto.response.ServiceResponseDTO responseDTO = new com.example.promonade.dto.response.ServiceResponseDTO(updatedService.getId(), updatedService.getName(), updatedService.getDescription(), updatedService.getPrice());
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    public ResponseEntity<?> updateService(@PathVariable("serviceId") int serviceId, @RequestBody ServiceRequest serviceRequest) {
+        Service updatedService = serviceService.updateService(serviceId, serviceRequest);
+        return ResponseEntity.ok(updatedService);
+    }
+
+    @GetMapping("/{serviceId}")
+    public ResponseEntity<?> getService(@PathVariable("serviceId") int serviceId){
+        return ResponseEntity.ok(serviceService.getServiceById(serviceId));
+    }
+
+    @GetMapping()
+    public ResponseEntity<?> getAllServices(){
+        return ResponseEntity.ok(serviceService.getAllServices());
     }
 }

@@ -1,51 +1,75 @@
 package com.example.promonade.service;
-import com.example.promonade.dto.response.ProductResponseDTO;
-import com.example.promonade.exceptions.promotionExceptions.ResourceNotFoundException;
+import com.example.promonade.dto.request.productservicedtos.ProductRequest;
+import com.example.promonade.dto.response.UpdationResponse;
+import com.example.promonade.exceptions.productServiceExceptions.ProductIncompleteException;
+import com.example.promonade.exceptions.productServiceExceptions.ProductNotFoundException;
+
 import com.example.promonade.repositories.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.promonade.service.transformers.Product_ServiceTransformer;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+
 import com.example.promonade.models.Product;
+import org.springframework.stereotype.Service;
+
+@Service
+@AllArgsConstructor
 public class ProductService {
-    @Autowired
-    private ProductRepository productRepository;
 
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
+    private final ProductRepository productRepository;
 
-    public Product addProduct(Product product) {
+
+    public Product addProduct(ProductRequest productRequest) {
+        if(productRequest.getName()==null){
+            throw new ProductIncompleteException("Product name cannot be empty");
+        }
+        if(productRequest.getDescription()==null){
+            throw new ProductIncompleteException("Product description cannot be empty");
+        }
+        if(productRequest.getPrice()==null){
+            throw new ProductIncompleteException("Product price cannot be empty");
+        }
+        Product product = Product_ServiceTransformer.productRequestToProduct(productRequest);
         return productRepository.save(product);
     }
 
-    public List<ProductResponseDTO> getAllProducts() {
-        return productRepository.findAll().stream()
-                .map(ProductResponseDTO::new)
-                .collect(Collectors.toList());
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 
-    public ProductResponseDTO getProductById(Long productId) {
-        Product product = getProductFromRepository(productId);
-        return new ProductResponseDTO(product.getId(), product.getName(), product.getDescription(), product.getPrice());
+    public Product getProductById(int productId) {
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if(productOptional.isEmpty()){
+            throw new ProductNotFoundException("Product not found for id " +productId);
+        }
+        return productOptional.get();
     }
 
-    public Product updateProduct(Long productId, Product product) {
-        Product existingProduct = getProductFromRepository(productId);
-        existingProduct.setName(product.getName());
-        existingProduct.setDescription(product.getDescription());
-        existingProduct.setPrice(product.getPrice());
-        // Set other attributes as needed
+    public Product updateProduct(int productId, ProductRequest productRequest) {
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if(productOptional.isEmpty()){
+            throw new ProductNotFoundException("Product not found for id " +productId);
+        }
+        Product existingProduct = productOptional.get();
+
+        existingProduct.setName(productRequest.getName());
+        existingProduct.setDescription(productRequest.getDescription());
+        existingProduct.setPrice(productRequest.getPrice());
+
         return productRepository.save(existingProduct);
     }
 
-    public void deleteProduct(Long productId) {
-        productRepository.deleteById(productId);
+    public UpdationResponse deleteProduct(int productId) {
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if(productOptional.isEmpty()){
+            throw new ProductNotFoundException("Product not found for id " +productId);
+        }
+        Product product = productOptional.get();
+        productRepository.delete(product);
+        return new UpdationResponse(String.format("Product %s with id %d is successfully deleted", product.getName(), productId), true);
     }
 
-    private Product getProductFromRepository(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
-    }
 
 }

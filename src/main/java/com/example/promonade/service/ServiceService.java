@@ -1,45 +1,71 @@
 package com.example.promonade.service;
 
-import com.example.promonade.dto.response.ServiceResponseDTO;
-import com.example.promonade.dto.response.ServiceResponseDTO;
-import com.example.promonade.exceptions.promotionExceptions.ResourceNotFoundException;
+import com.example.promonade.dto.request.productservicedtos.ServiceRequest;
+import com.example.promonade.dto.response.UpdationResponse;
+import com.example.promonade.exceptions.productServiceExceptions.ServiceIncompleteException;
+import com.example.promonade.exceptions.productServiceExceptions.ServiceNotFoundException;
 import com.example.promonade.models.Service;
 import com.example.promonade.repositories.ServiceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.promonade.service.transformers.Product_ServiceTransformer;
+import lombok.AllArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 
 @org.springframework.stereotype.Service
+@AllArgsConstructor
 public class ServiceService {
 
     private final ServiceRepository serviceRepository;
 
-    @Autowired
-    public ServiceService(ServiceRepository serviceRepository) {
-        this.serviceRepository = serviceRepository;
-    }
-
-    public Service addService(Service service) {
+    public Service addService(ServiceRequest serviceRequest) {
+        if(serviceRequest.getName()==null){
+            throw new ServiceIncompleteException("Product name cannot be empty");
+        }
+        if(serviceRequest.getDescription()==null){
+            throw new ServiceIncompleteException("Product description cannot be empty");
+        }
+        if(serviceRequest.getPrice()==null){
+            throw new ServiceIncompleteException("Product price cannot be empty");
+        }
+        Service service = Product_ServiceTransformer.serviceRequestToService(serviceRequest);
         return serviceRepository.save(service);
     }
 
-    public void deleteService(Long serviceId) {
-        serviceRepository.deleteById(serviceId);
+    public UpdationResponse deleteService(int serviceId) {
+        Optional<Service> serviceOptional = serviceRepository.findById(serviceId);
+        if(serviceOptional.isEmpty()){
+            throw new ServiceNotFoundException("Service not found for id " +serviceId);
+        }
+        Service service = serviceOptional.get();
+        serviceRepository.delete(service);
+        return new UpdationResponse(String.format("Service %s with id %d is successfully deleted", service.getName(), serviceId), true);
     }
 
-    public ServiceResponseDTO updateService(Long serviceId, Service newService) {
-        Optional<Service> optionalExistingService = serviceRepository.findById(serviceId);
-        if (optionalExistingService.isPresent()) {
-            Service existingService = optionalExistingService.get();
-            existingService.setName(newService.getName());
-            existingService.setDescription(newService.getDescription());
-            existingService.setPrice(newService.getPrice());
-            // Set other attributes as needed
-            Service updatedService = serviceRepository.save(existingService);
-            return new ServiceResponseDTO(updatedService.getId(), updatedService.getName(), updatedService.getDescription(), updatedService.getPrice());
-        } else {
-            throw new ResourceNotFoundException("Service not found with id: " + serviceId);
+    public Service updateService(int serviceId, ServiceRequest serviceRequest) {
+        Optional<Service> serviceOptional = serviceRepository.findById(serviceId);
+        if(serviceOptional.isEmpty()){
+            throw new ServiceNotFoundException("Service not found for id " +serviceId);
         }
+        Service existingService = serviceOptional.get();
+
+        existingService.setName(serviceRequest.getName());
+        existingService.setDescription(serviceRequest.getDescription());
+        existingService.setPrice(serviceRequest.getPrice());
+
+        return serviceRepository.save(existingService);
+    }
+
+    public List<Service> getAllServices() {
+        return serviceRepository.findAll();
+    }
+
+    public Service getServiceById(int serviceId) {
+        Optional<Service> serviceOptional = serviceRepository.findById(serviceId);
+        if(serviceOptional.isEmpty()){
+            throw new ServiceNotFoundException("Service not found for id " +serviceId);
+        }
+        return serviceOptional.get();
     }
 }
 

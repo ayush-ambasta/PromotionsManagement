@@ -1,14 +1,11 @@
 package com.example.promonade.repositories;
 
 import com.example.promonade.models.Service;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.util.Optional;
 
-public interface ServiceRepository {
+public interface ServiceRepository extends JpaRepository<Service, Integer> {
 
-    Optional<Service> findById(Long id);
-
-    void deleteById(Long serviceId);
-
-    Service save(Service existingService);
 }
 

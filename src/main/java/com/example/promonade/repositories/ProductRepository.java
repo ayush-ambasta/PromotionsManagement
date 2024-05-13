@@ -4,15 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.promonade.models.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ProductRepository {
-    Optional<Product> findById(Long id);
-
-    List<Product> findAll();
-
-    Product save(Product existingProduct);
-
-    void deleteById(Long productId);
+public interface ProductRepository extends JpaRepository<Product, Integer> {
 }
 
 
