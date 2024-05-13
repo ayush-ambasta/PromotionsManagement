@@ -1,6 +1,7 @@
 package com.example.promonade.exceptions;
 
 import com.example.promonade.dto.response.MessageResponse;
+import com.example.promonade.exceptions.customerExceptions.CustomerNotFoundException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionIncompleteException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
 import com.example.promonade.exceptions.userExceptions.*;
@@ -23,7 +24,8 @@ public class GlobalExceptionHandler {
             TeamNotAuthorisedException.class,
             TeamNotExistsException.class,
             UserNotFoundException.class,
-            UserNotAuthorisedException.class
+            UserNotAuthorisedException.class,
+            CustomerNotFoundException.class
     })
     public final ResponseEntity<?> handeException(RuntimeException ex, WebRequest request){
         LOGGER.error("Handling " + ex.getClass().getSimpleName() + " due to " + ex.getMessage());
