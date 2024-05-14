@@ -1,6 +1,13 @@
 package com.example.promonade.controllers;
 
-import com.example.promonade.dto.response.CustomerResponse;
+import com.example.promonade.dto.request.customerdtos.BehaviourRequest;
+import com.example.promonade.dto.request.customerdtos.DemographyRequest;
+import com.example.promonade.dto.request.customerdtos.PurchaseRequest;
+import com.example.promonade.dto.response.UpdationResponse;
+import com.example.promonade.models.Behaviour;
+import com.example.promonade.models.Customer;
+import com.example.promonade.models.Demographics;
+import com.example.promonade.models.Purchase;
 import com.example.promonade.service.CustomerService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,15 +22,34 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping
-    public ResponseEntity<CustomerResponse> addCustomer()
+    public Customer addCustomer()
     {
-       return new ResponseEntity<>(customerService.addCustomer(), HttpStatus.CREATED);
+       return customerService.addCustomer();
+    }
+
+    @PostMapping("/behaviour")
+    public Behaviour addBehaviour(@RequestBody BehaviourRequest behaviourRequest)
+    {
+        return customerService.addBehaviour(behaviourRequest);
+    }
+
+    @PostMapping("/demographics")
+    public Demographics addDemographics(@RequestBody DemographyRequest demographyRequest)
+    {
+        return customerService.addDemographics(demographyRequest);
+    }
+
+    @PostMapping("/purchase")
+    public Purchase addPurchase(@RequestBody PurchaseRequest purchaseRequest)
+    {
+        return customerService.addPurchase(purchaseRequest);
     }
 
     @DeleteMapping
-    public  ResponseEntity<String> deleteCustomer(@RequestParam("id") Long id)
+    public  ResponseEntity<UpdationResponse> deleteCustomer(@RequestParam("id") Long id)
     {
         customerService.deleteCustomer(id);
-        return new ResponseEntity<>("Customer is deleted",HttpStatus.ACCEPTED);
+        UpdationResponse updationResponse = new UpdationResponse("Customer is deleted",true);
+        return new ResponseEntity<>(updationResponse,HttpStatus.ACCEPTED);
     }
 }

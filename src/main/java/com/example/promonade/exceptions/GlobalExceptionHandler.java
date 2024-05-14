@@ -1,6 +1,7 @@
 package com.example.promonade.exceptions;
 
 import com.example.promonade.dto.response.MessageResponse;
+import com.example.promonade.exceptions.customerExceptions.PurchasedProductsandServicesNotFound;
 import com.example.promonade.exceptions.productServiceExceptions.ProductIncompleteException;
 import com.example.promonade.exceptions.productServiceExceptions.ProductNotFoundException;
 import com.example.promonade.exceptions.productServiceExceptions.ServiceIncompleteException;
@@ -33,7 +34,8 @@ public class GlobalExceptionHandler {
             ProductNotFoundException.class,
             ServiceIncompleteException.class,
             ServiceNotFoundException.class,
-            CustomerNotFoundException.class
+            CustomerNotFoundException.class,
+            PurchasedProductsandServicesNotFound.class
     })
     public final ResponseEntity<?> handeException(RuntimeException ex, WebRequest request){
         LOGGER.error("Handling " + ex.getClass().getSimpleName() + " due to " + ex.getMessage());
