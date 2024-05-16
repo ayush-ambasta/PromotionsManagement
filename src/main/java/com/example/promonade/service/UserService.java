@@ -90,18 +90,12 @@ public class UserService {
 
     public List<UserResponse> getAllUsers() {
         List<User> allUsers = userRepository.findAll();
-        List<UserResponse> userResponses = new ArrayList<>();
 
-        for (User user : allUsers) {
 
-            UserResponse userResponse = UserTransformer.UserToUserResponse(user);
-
-            userResponses.add(userResponse);
-        }
-
-        return userResponses;
+        return allUsers.stream()
+                .map(UserTransformer::UserToUserResponse)
+                .collect(Collectors.toList());
     }
-
 
     public UpdationResponse deleteUser(String username,String authToken)  {
 

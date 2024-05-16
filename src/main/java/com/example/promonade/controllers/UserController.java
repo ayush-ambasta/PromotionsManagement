@@ -17,7 +17,6 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/all")
-
     @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
     public ResponseEntity<?> getAllUsers() {
 
