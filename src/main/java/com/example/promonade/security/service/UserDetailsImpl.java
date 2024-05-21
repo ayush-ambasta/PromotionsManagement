@@ -1,6 +1,7 @@
 package com.example.promonade.security.service;
 
 
+import com.example.promonade.enums.userEnums.Team;
 import com.example.promonade.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,16 +25,17 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password1;
 
-
+    private Team team;
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(Integer id, String username, String email, String password1,
-                           Collection<? extends GrantedAuthority> authorities) {
+                           Collection<? extends GrantedAuthority> authorities,Team team) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password1 = password1;
         this.authorities = authorities;
+        this.team=team;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -47,7 +49,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword1(),
-                authorities);
+                authorities,
+                user.getTeam());
     }
 
     @Override
@@ -72,6 +75,9 @@ public class UserDetailsImpl implements UserDetails {
     public String getUsername() {
         return username;
     }
+
+
+    public Team getTeam() {return team; }
 
     @Override
     public boolean isAccountNonExpired() {

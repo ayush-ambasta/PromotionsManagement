@@ -5,8 +5,6 @@ import com.example.promonade.enums.userEnums.Team;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,12 +18,13 @@ public class JwtResponse {
     String username;
     String email;
     ERole role;
-
-    public JwtResponse(String accessToken, Integer id, String username, String email, String role) {
+    Team team;
+    public JwtResponse(String accessToken, Integer id, String username, String email, String role, Team team) {
         this.accessToken = accessToken;
         this.id = id;
         this.username = username;
         this.email = email;
         this.role = role.equals("OWNER")?ERole.OWNER: ERole.MANAGER;
+        this.team= team;
     }
 }

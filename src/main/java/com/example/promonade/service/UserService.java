@@ -60,7 +60,8 @@ public class UserService {
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
-                roles.get(0));
+                roles.get(0),
+                userDetails.getTeam());
     }
 
     public SignupResponse registerUser(SignupRequest signUpRequest){
