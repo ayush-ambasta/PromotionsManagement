@@ -31,7 +31,9 @@ public class UserTransformer {
                 .build();
     }
 
+
     public static UserResponse UserToUserResponse(User user) {
+
         return UserResponse.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())

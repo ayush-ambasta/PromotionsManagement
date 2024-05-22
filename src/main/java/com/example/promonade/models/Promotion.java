@@ -47,5 +47,7 @@ public class Promotion {
     @CreationTimestamp
     Date createdAt;
 
+    boolean decline = false;
+
     boolean active = false;
 }

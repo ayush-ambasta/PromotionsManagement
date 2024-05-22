@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin(origins = "*")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/user")
@@ -19,6 +19,7 @@ public class UserController {
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
     public ResponseEntity<?> getAllUsers() {
+
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -28,6 +29,7 @@ public class UserController {
                                         @RequestHeader("Authorization") String headerAuth){
         return ResponseEntity.ok(userService.deleteUser(username,headerAuth));
     }
+
 
     @GetMapping("/current-team-users")
     @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
@@ -48,5 +50,6 @@ public class UserController {
     @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
     public ResponseEntity<?>getAllUserFromTeam(@RequestParam("team") Team team) {
         return ResponseEntity.ok(userService.getAllUserFromTeam(team));
+
     }
 }

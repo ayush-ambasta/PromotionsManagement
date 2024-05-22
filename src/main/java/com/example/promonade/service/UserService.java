@@ -8,7 +8,9 @@ import com.example.promonade.dto.response.userdtos.SignupResponse;
 import com.example.promonade.dto.response.userdtos.UserResponse;
 import com.example.promonade.enums.userEnums.ERole;
 import com.example.promonade.enums.userEnums.Team;
+
 import com.example.promonade.exceptions.userExceptions.*;
+
 import com.example.promonade.models.User;
 import com.example.promonade.repositories.UserRepository;
 import com.example.promonade.security.jwt.JwtUtils;
@@ -58,7 +60,8 @@ public class UserService {
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
-                roles.get(0));
+                roles.get(0),
+                userDetails.getTeam());
     }
 
     public SignupResponse registerUser(SignupRequest signUpRequest){
@@ -89,12 +92,14 @@ public class UserService {
     public List<UserResponse> getAllUsers() {
         List<User> allUsers = userRepository.findAll();
 
+
         return allUsers.stream()
                 .map(UserTransformer::UserToUserResponse)
                 .collect(Collectors.toList());
     }
 
     public UpdationResponse deleteUser(String username,String authToken)  {
+
         Optional<User> userOptional = userRepository.findByUsername(username);
         if(userOptional.isEmpty()){
             throw new UserNotFoundException("User with username " + username + " does not exist");
@@ -105,13 +110,16 @@ public class UserService {
         String userTeam = user.getTeam().toString();
 
         if(user.getRole().equals(ERole.OWNER)){
+
             throw new UserNotAuthorisedException("User cannot delete another Owner");
+
         }
         //when team does not match
         if(!userTeam.equals(ownerTeam)){
             throw new TeamNotAuthorisedException(String.format("The owner team %s cannot delete %s user team!", ownerTeam, userTeam));
         }
         userRepository.delete(user);
+
         return new UpdationResponse(String.format("Successfully deleted user %s", username), true);
 
     }
@@ -144,5 +152,6 @@ public class UserService {
         return allUsers.stream()
                 .map(UserTransformer::UserToUserResponse)
                 .collect(Collectors.toList());
+
     }
 }

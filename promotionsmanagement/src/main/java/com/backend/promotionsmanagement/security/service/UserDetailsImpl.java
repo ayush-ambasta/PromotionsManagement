@@ -1,17 +1,17 @@
-package com.example.promonade.security.service;
+package com.backend.promotionsmanagement.security.service;
 
-
-import com.example.promonade.enums.userEnums.Team;
-import com.example.promonade.models.User;
+import com.backend.promotionsmanagement.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
@@ -25,32 +25,29 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password1;
 
-    private Team team;
+
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(Integer id, String username, String email, String password1,
-                           Collection<? extends GrantedAuthority> authorities,Team team) {
+                           Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password1 = password1;
         this.authorities = authorities;
-        this.team=team;
     }
 
     public static UserDetailsImpl build(User user) {
-
-        List<GrantedAuthority> authorities = new ArrayList<>(){{
-            add(new SimpleGrantedAuthority(user.getRole().toString()));
-        }};
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                .collect(Collectors.toList());
 
         return new UserDetailsImpl(
                 user.getUserId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword1(),
-                authorities,
-                user.getTeam());
+                authorities);
     }
 
     @Override
@@ -75,9 +72,6 @@ public class UserDetailsImpl implements UserDetails {
     public String getUsername() {
         return username;
     }
-
-
-    public Team getTeam() {return team; }
 
     @Override
     public boolean isAccountNonExpired() {

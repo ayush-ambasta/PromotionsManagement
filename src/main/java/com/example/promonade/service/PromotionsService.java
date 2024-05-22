@@ -187,6 +187,7 @@ public class PromotionsService {
         }
 
         promotion.setApproved(false);
+        promotion.setDecline(true);
         Promotion promotion1 = promotionRepository.save(promotion);
 
         String message = String.format("Promotion %s with id %d is successfully disapproved", promotion1.getName(), promotion1.getId());

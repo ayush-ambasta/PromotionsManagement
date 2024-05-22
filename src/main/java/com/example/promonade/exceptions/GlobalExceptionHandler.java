@@ -1,6 +1,7 @@
 package com.example.promonade.exceptions;
 
 import com.example.promonade.dto.response.MessageResponse;
+
 import com.example.promonade.exceptions.productServiceExceptions.ProductIncompleteException;
 import com.example.promonade.exceptions.productServiceExceptions.ProductNotFoundException;
 import com.example.promonade.exceptions.productServiceExceptions.ServiceIncompleteException;
@@ -8,6 +9,7 @@ import com.example.promonade.exceptions.productServiceExceptions.ServiceNotFound
 import com.example.promonade.exceptions.promotionExceptions.PromotionIncompleteException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
 import com.example.promonade.exceptions.userExceptions.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ public class GlobalExceptionHandler {
             UserExistsException.class,
             PromotionNotFoundException.class,
             TeamNotAuthorisedException.class,
+
             TeamNotExistsException.class,
             UserNotFoundException.class,
             UserNotAuthorisedException.class,
@@ -32,6 +35,7 @@ public class GlobalExceptionHandler {
             ProductNotFoundException.class,
             ServiceIncompleteException.class,
             ServiceNotFoundException.class
+
     })
     public final ResponseEntity<?> handeException(RuntimeException ex, WebRequest request){
         LOGGER.error("Handling " + ex.getClass().getSimpleName() + " due to " + ex.getMessage());
