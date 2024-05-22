@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface PromotionRepository extends JpaRepository<Promotion, Integer> {
 
-    @Query("select p from Promotion p where p.approved = false and category = :category")
+    @Query("select p from Promotion p where p.approved = false and category = :category and decline = false")
     List<Promotion> findNonApprovedPromotionsByCategory(@Param("category")PromotionCategory category);
 
     @Query("select p from Promotion p where p.approved = true and category = :category")
