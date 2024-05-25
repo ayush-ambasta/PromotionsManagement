@@ -58,6 +58,12 @@ public class PromotionsController {
         return ResponseEntity.ok(promotionsService.getApprovedPromotionsForUserTeam(headerAuth));
     }
 
+    @GetMapping("/get-approved")
+    @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('OWNER')")
+    public ResponseEntity<?> getApprovedPromotions() {
+        return ResponseEntity.ok(promotionsService.getApprovedPromotions());
+    }
+
     @PostMapping("/approve-promotion")
     @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<?> approvePromotion(@RequestParam("id") int id, @RequestHeader("Authorization") String headerAuth) {

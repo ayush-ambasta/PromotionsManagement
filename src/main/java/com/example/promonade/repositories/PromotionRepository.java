@@ -15,4 +15,7 @@ public interface PromotionRepository extends JpaRepository<Promotion, Integer> {
 
     @Query("select p from Promotion p where p.approved = true and category = :category")
     List<Promotion> findApprovedPromotionsByCategory(@Param("category")PromotionCategory category);
+
+    @Query("select p from Promotion p where p.approved = true")
+    List<Promotion> findApprovedPromotions();
 }

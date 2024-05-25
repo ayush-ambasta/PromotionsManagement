@@ -23,6 +23,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
@@ -142,6 +143,10 @@ public class PromotionsService {
         return promotionRepository.findApprovedPromotionsByCategory(category);
     }
 
+    public List<Promotion> getApprovedPromotions() {
+        return promotionRepository.findApprovedPromotions();
+    }
+
     public UpdationResponse approvePromotion(int id, String headerAuth) {
         Optional<Promotion> promotionOptional = promotionRepository.findById(id);
         if(promotionOptional.isEmpty()){
@@ -159,9 +164,14 @@ public class PromotionsService {
         }
 
         promotion.setApproved(true);
-
-        schedulePromotion(promotion, PromotionScheduleAction.ACTIVATEPROMOTION);
-        schedulePromotion(promotion, PromotionScheduleAction.DEACTIVATEPROMOTION);
+        if(promotion.getValidFrom().after(Date.from(Instant.now()))) {
+            System.out.println("Scheduling from");
+            schedulePromotion(promotion, PromotionScheduleAction.ACTIVATEPROMOTION);
+        }
+        if(promotion.getValidTill().after(Date.from(Instant.now()))){
+            System.out.println("Scheduling till");
+            schedulePromotion(promotion, PromotionScheduleAction.DEACTIVATEPROMOTION);
+        }
 
         Promotion promotion1 = promotionRepository.save(promotion);
 
@@ -248,4 +258,6 @@ public class PromotionsService {
         promotionRepository.deleteAll();
         return new UpdationResponse("All promotions deleted successfully", true);
     }
+
+
 }
