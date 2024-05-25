@@ -89,15 +89,19 @@ public class CustomerService {
 
             Purchase purchase = new Purchase();
             double amountSpent = 0;
-            for (int productId : productIdList) {
-                Product product = productService.getProductById(productId);
-                purchase.getProductList().add(product);
-                amountSpent += product.getPrice();
+            if(productIdList !=null) {
+                for (int productId : productIdList) {
+                    Product product = productService.getProductById(productId);
+                    purchase.getProductList().add(product);
+                    amountSpent += product.getPrice();
+                }
             }
-            for (int serviceId : serviceIdList) {
-                Service service = serviceService.getServiceById(serviceId);
-                purchase.getServiceList().add(service);
-                amountSpent += service.getPrice();
+            if(serviceIdList !=null) {
+                for (int serviceId : serviceIdList) {
+                    Service service = serviceService.getServiceById(serviceId);
+                    purchase.getServiceList().add(service);
+                    amountSpent += service.getPrice();
+                }
             }
             purchase.setAmountSpent(amountSpent);
             if(purchaseRequest.getPromotionId() > 0)
@@ -109,5 +113,14 @@ public class CustomerService {
             customerRepository.save(customer);
             return savedPurchase;
 
+    }
+
+    public Customer getCustomerById(Long id) {
+        Optional<Customer> customerOptional = customerRepository.findById(id);
+        if(customerOptional.isEmpty())
+        {
+            throw new CustomerNotFoundException("No customer found having the given Id");
+        }
+        return customerOptional.get();
     }
 }

@@ -22,12 +22,18 @@ public class Purchase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long Id;
     //product and services will have many to many relation because multiple customer's purchases can have same products or services
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name="purchase_id")
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "purchased_products",
+            joinColumns = @JoinColumn(name = "purchase_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id"))
     List<Product> productList = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name="purchase_id")
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "purchased_services",
+            joinColumns = @JoinColumn(name = "purchase_id"),
+            inverseJoinColumns = @JoinColumn(name = "service_id"))
     List<Service> serviceList = new ArrayList<>();
 
     @CreationTimestamp

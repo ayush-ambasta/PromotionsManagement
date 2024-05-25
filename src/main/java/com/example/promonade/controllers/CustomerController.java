@@ -52,4 +52,11 @@ public class CustomerController {
         UpdationResponse updationResponse = new UpdationResponse("Customer is deleted",true);
         return new ResponseEntity<>(updationResponse,HttpStatus.ACCEPTED);
     }
+
+
+    @GetMapping
+    public Customer getCustomerById(@RequestParam("id") Long id)
+    {
+        return customerService.getCustomerById(id);
+    }
 }
