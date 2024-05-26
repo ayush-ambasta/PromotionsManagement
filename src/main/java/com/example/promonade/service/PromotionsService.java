@@ -165,12 +165,14 @@ public class PromotionsService {
 
         promotion.setApproved(true);
         if(promotion.getValidFrom().after(Date.from(Instant.now()))) {
-            System.out.println("Scheduling from");
             schedulePromotion(promotion, PromotionScheduleAction.ACTIVATEPROMOTION);
+        } else {
+            promotion.setActive(true);
         }
         if(promotion.getValidTill().after(Date.from(Instant.now()))){
-            System.out.println("Scheduling till");
             schedulePromotion(promotion, PromotionScheduleAction.DEACTIVATEPROMOTION);
+        } else {
+            promotion.setActive(false);
         }
 
         Promotion promotion1 = promotionRepository.save(promotion);
