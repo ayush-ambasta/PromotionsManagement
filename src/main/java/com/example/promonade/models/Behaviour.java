@@ -29,7 +29,7 @@ public class Behaviour {
 
     int purchaseFrequency;
 
-    Date lastLoginTime;
+    String lastLoginTime;
 
     double expenditure;
 

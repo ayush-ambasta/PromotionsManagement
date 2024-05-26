@@ -123,4 +123,8 @@ public class CustomerService {
         }
         return customerOptional.get();
     }
+
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll();
+    }
 }
