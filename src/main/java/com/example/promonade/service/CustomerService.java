@@ -102,6 +102,7 @@ public class CustomerService {
                 purchase.getServiceList().add(service);
                 amountSpent += service.getPrice();
             }
+<<<<<<< HEAD
         }
         purchase.setAmountSpent(amountSpent);
         if(purchaseRequest.getPromotionId() > 0)
@@ -113,6 +114,18 @@ public class CustomerService {
         customer.getPurchaseList().add(savedPurchase);
         customerRepository.save(customer);
         return savedPurchase;
+=======
+            purchase.setAmountSpent(amountSpent);
+            purchase.setTimeOfPurchase(purchaseRequest.getTimeOfPurchase());
+            if(purchaseRequest.getPromotionId() > 0)
+            {
+                purchase.setPromotionUsed(promotionsService.getPromotion(purchaseRequest.getPromotionId()));
+            }
+            Purchase savedPurchase = purchaseRepository.save(purchase);
+            customer.getPurchaseList().add(savedPurchase);
+            customerRepository.save(customer);
+            return savedPurchase;
+>>>>>>> 5dd024d0e67ac0f0902bb39bcd6311e70cc51f2e
 
     }
 
