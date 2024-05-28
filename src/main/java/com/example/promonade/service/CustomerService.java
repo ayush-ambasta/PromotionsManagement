@@ -104,6 +104,7 @@ public class CustomerService {
                 }
             }
             purchase.setAmountSpent(amountSpent);
+            purchase.setTimeOfPurchase(purchaseRequest.getTimeOfPurchase());
             if(purchaseRequest.getPromotionId() > 0)
             {
                 purchase.setPromotionUsed(promotionsService.getPromotion(purchaseRequest.getPromotionId()));

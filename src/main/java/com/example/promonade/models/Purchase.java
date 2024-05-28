@@ -1,9 +1,10 @@
 package com.example.promonade.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
+
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,7 +37,6 @@ public class Purchase {
             inverseJoinColumns = @JoinColumn(name = "service_id"))
     List<Service> serviceList = new ArrayList<>();
 
-    @CreationTimestamp
     Date timeOfPurchase;
 
     double amountSpent;
