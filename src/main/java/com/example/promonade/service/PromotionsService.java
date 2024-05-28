@@ -5,6 +5,7 @@ import com.example.promonade.dto.request.promotiondtos.PromotionRequest;
 import com.example.promonade.dto.response.UpdationResponse;
 import com.example.promonade.enums.promotionEnums.PromotionCategory;
 import com.example.promonade.enums.promotionEnums.PromotionScheduleAction;
+import com.example.promonade.enums.userEnums.ERole;
 import com.example.promonade.enums.userEnums.Team;
 import com.example.promonade.exceptions.promotionExceptions.PromotionIncompleteException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
@@ -64,6 +65,20 @@ public class PromotionsService {
 
         Promotion promotion = PromotionTransformer.promotionRequestToPromotion(promotionRequest, createdBy);
 
+        if(createdBy.getRole()==ERole.OWNER){
+            promotion.setApproved(true);
+            if(promotion.getValidFrom().after(Date.from(Instant.now()))) {
+                schedulePromotion(promotion, PromotionScheduleAction.ACTIVATEPROMOTION);
+            } else {
+                promotion.setActive(true);
+            }
+            if(promotion.getValidTill().after(Date.from(Instant.now()))){
+                schedulePromotion(promotion, PromotionScheduleAction.DEACTIVATEPROMOTION);
+            } else {
+                promotion.setActive(false);
+            }
+        }
+
         promotionRepository.save(promotion);
 
         return promotion;
@@ -122,6 +137,20 @@ public class PromotionsService {
         criteriaRequest.setMaritalStatus(criteriaRequest.getMaritalStatus());
 
         promotion.setCriteria(criteria);
+
+        removeScheduledPromotion(promotion);
+        if(promotion.getApproved()){
+            if(promotion.getValidFrom().after(Date.from(Instant.now()))) {
+                schedulePromotion(promotion, PromotionScheduleAction.ACTIVATEPROMOTION);
+            } else {
+                promotion.setActive(true);
+            }
+            if(promotion.getValidTill().after(Date.from(Instant.now()))){
+                schedulePromotion(promotion, PromotionScheduleAction.DEACTIVATEPROMOTION);
+            } else {
+                promotion.setActive(false);
+            }
+        }
 
         return promotionRepository.save(promotion);
     }
@@ -224,11 +253,18 @@ public class PromotionsService {
         jobsMap.put(jobId, scheduledTask);
     }
 
-    public void removeScheduledPromotion(int jobId){
-        ScheduledFuture<?> scheduledTask = jobsMap.get(jobId);
-        if(scheduledTask != null) {
-            scheduledTask.cancel(true);
-            jobsMap.put(jobId, null);
+    public void removeScheduledPromotion(Promotion promotion){
+        int jobId_a = promotion.getId()*2;
+        int jobId_d = (promotion.getId()*2)+1;
+        ScheduledFuture<?> scheduledTask_a = jobsMap.get(jobId_a);
+        ScheduledFuture<?> scheduledTask_d = jobsMap.get(jobId_d);
+        if(scheduledTask_a != null) {
+            scheduledTask_a.cancel(true);
+            jobsMap.put(jobId_a, null);
+        }
+        if(scheduledTask_d != null) {
+            scheduledTask_d.cancel(true);
+            jobsMap.put(jobId_d, null);
         }
     }
 
