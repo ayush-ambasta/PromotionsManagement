@@ -4,6 +4,7 @@ package com.example.promonade.dto.request.customerdtos;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor
@@ -21,7 +22,7 @@ public class PurchaseRequest {
 
     List<Integer> serviceIdList;
 
-    double amountSpent;
+    Date timeOfPurchase;
 
     int promotionId;
 

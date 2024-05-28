@@ -36,7 +36,6 @@ public class Purchase {
             inverseJoinColumns = @JoinColumn(name = "service_id"))
     List<Service> serviceList = new ArrayList<>();
 
-    @CreationTimestamp
     Date timeOfPurchase;
 
     double amountSpent;

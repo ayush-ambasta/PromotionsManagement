@@ -87,31 +87,32 @@ public class CustomerService {
           throw new PurchasedProductsandServicesNotFound("No products and services selected to buy");
         }
 
-            Purchase purchase = new Purchase();
-            double amountSpent = 0;
-            if(productIdList !=null) {
-                for (int productId : productIdList) {
-                    Product product = productService.getProductById(productId);
-                    purchase.getProductList().add(product);
-                    amountSpent += product.getPrice();
-                }
+        Purchase purchase = new Purchase();
+        double amountSpent = 0;
+        if(productIdList !=null) {
+            for (int productId : productIdList) {
+                Product product = productService.getProductById(productId);
+                purchase.getProductList().add(product);
+                amountSpent += product.getPrice();
             }
-            if(serviceIdList !=null) {
-                for (int serviceId : serviceIdList) {
-                    Service service = serviceService.getServiceById(serviceId);
-                    purchase.getServiceList().add(service);
-                    amountSpent += service.getPrice();
-                }
+        }
+        if(serviceIdList !=null) {
+            for (int serviceId : serviceIdList) {
+                Service service = serviceService.getServiceById(serviceId);
+                purchase.getServiceList().add(service);
+                amountSpent += service.getPrice();
             }
-            purchase.setAmountSpent(amountSpent);
-            if(purchaseRequest.getPromotionId() > 0)
-            {
-                purchase.setPromotionUsed(promotionsService.getPromotion(purchaseRequest.getPromotionId()));
-            }
-            Purchase savedPurchase = purchaseRepository.save(purchase);
-            customer.getPurchaseList().add(savedPurchase);
-            customerRepository.save(customer);
-            return savedPurchase;
+        }
+        purchase.setAmountSpent(amountSpent);
+        if(purchaseRequest.getPromotionId() > 0)
+        {
+            purchase.setPromotionUsed(promotionsService.getPromotion(purchaseRequest.getPromotionId()));
+        }
+        purchase.setTimeOfPurchase(purchaseRequest.getTimeOfPurchase());
+        Purchase savedPurchase = purchaseRepository.save(purchase);
+        customer.getPurchaseList().add(savedPurchase);
+        customerRepository.save(customer);
+        return savedPurchase;
 
     }
 
