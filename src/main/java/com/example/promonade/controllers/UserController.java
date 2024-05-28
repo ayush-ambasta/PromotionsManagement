@@ -40,7 +40,6 @@ public class UserController {
 //    below endpoints are for development purpose
 
     @DeleteMapping("/delete-noauth/{username}")
-    @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
     public ResponseEntity<?> deleteUserNoAuth(@PathVariable("username") String username){
         return ResponseEntity.ok(userService.deleteUserNoAuth(username));
     }
