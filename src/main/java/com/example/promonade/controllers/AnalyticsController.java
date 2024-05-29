@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/analytics")
@@ -23,63 +23,105 @@ public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
 
-    public AnalyticsController(AnalyticsService analyticsService) {
-        this.analyticsService = analyticsService;
-    }
-
     @GetMapping("/conversion-rate")
     public ConversionRateResponse getConversionRate(
-            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        double conversionRate = analyticsService.getConversionRate(java.sql.Date.valueOf(startDate.toLocalDate()), java.sql.Date.valueOf(endDate.toLocalDate()));
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        double conversionRate = analyticsService.getConversionRate(startDate, endDate);
         return new ConversionRateResponse(conversionRate);
     }
 
     @GetMapping("/revenue-generated")
     public RevenueResponse getRevenueGenerated(
-            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        double totalRevenue = analyticsService.getRevenueGenerated(java.sql.Date.valueOf(startDate.toLocalDate()), java.sql.Date.valueOf(endDate.toLocalDate()));
-        return new RevenueResponse(totalRevenue);
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        double revenue = analyticsService.getRevenueGenerated(startDate, endDate);
+        return new RevenueResponse(revenue);
     }
 
-    @GetMapping("/revenue-with-coupon")
-    public RevenueResponse getRevenueGeneratedWithCoupon(
-            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            @RequestParam("couponCode") String couponCode) {
-        double totalRevenue = analyticsService.getRevenueGeneratedWithCoupon(java.sql.Date.valueOf(startDate.toLocalDate()), java.sql.Date.valueOf(endDate.toLocalDate()), couponCode);
-        return new RevenueResponse(totalRevenue);
+    @GetMapping("/revenue-generated-with-promotion")
+    public RevenueResponse getRevenueGeneratedWithPromotion(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+            @RequestParam("promotionId") Long promotionId) {
+        double revenue = analyticsService.getRevenueGeneratedWithPromotion(startDate, endDate, promotionId);
+        return new RevenueResponse(revenue);
     }
 
-    @GetMapping("/revenue-with-promotion")
-    public RevenueResponse getRevenueWithPromotion(
-            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        double totalRevenue = analyticsService.getRevenueWithPromotion(java.sql.Date.valueOf(startDate.toLocalDate()), java.sql.Date.valueOf(endDate.toLocalDate()));
-        return new RevenueResponse(totalRevenue);
+    @GetMapping("/revenue-generated-without-promotion")
+    public RevenueResponse getRevenueGeneratedWithoutPromotion(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        double revenue = analyticsService.getRevenueGeneratedWithoutPromotion(startDate, endDate);
+        return new RevenueResponse(revenue);
     }
 
-    @GetMapping("/revenue-without-promotion")
-    public RevenueResponse getRevenueWithoutPromotion(
-            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        double totalRevenue = analyticsService.getRevenueWithoutPromotion(java.sql.Date.valueOf(startDate.toLocalDate()), java.sql.Date.valueOf(endDate.toLocalDate()));
-        return new RevenueResponse(totalRevenue);
-    }
-
-    @GetMapping("/trending-coupons")
-    public TrendingCouponsResponse getTrendingCoupons(
-            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        List<String> trendingCoupons = analyticsService.getTrendingCoupons(java.sql.Date.valueOf(startDate.toLocalDate()), java.sql.Date.valueOf(endDate.toLocalDate()));
-        return new TrendingCouponsResponse(trendingCoupons);
+    @GetMapping("/trending-promotions")
+    public TrendingCouponsResponse getTrendingPromotions(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        List<Long> promotionIds = analyticsService.getTrendingPromotions(startDate, endDate);
+        return new TrendingCouponsResponse(promotionIds);
     }
 
     @GetMapping("/active-promotions")
     public List<Promotion> getActivePromotions(
-            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        return analyticsService.getActivePromotions(java.sql.Date.valueOf(startDate.toLocalDate()), java.sql.Date.valueOf(endDate.toLocalDate()));
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        return analyticsService.getActivePromotions(startDate, endDate);
+    }
+
+    @GetMapping("/login-frequency")
+    public List<Map<String, Object>> getLoginFrequencyByDate(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        return analyticsService.getLoginFrequencyByDate(startDate, endDate);
+    }
+
+    @GetMapping("/revenue-by-date")
+    public List<Map<String, Object>> getRevenueByDate(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        return analyticsService.getRevenueByDate(startDate, endDate);
+    }
+
+    @GetMapping("/purchases-by-date")
+    public List<Map<String, Object>> getPurchasesByDate(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        return analyticsService.getPurchasesByDate(startDate, endDate);
+    }
+
+    @GetMapping("/promotion-purchase-conversion-rate")
+    public ConversionRateResponse getPromotionPurchaseConversionRate(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+            @RequestParam("promotionId") Long promotionId) {
+        double conversionRate = analyticsService.getPromotionPurchaseConversionRate(startDate, endDate, promotionId);
+        return new ConversionRateResponse(conversionRate);
+    }
+
+    @GetMapping("/promotion-conversion-rate")
+    public ConversionRateResponse getPromotionConversionRate(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+            @RequestParam("promotionId") Long promotionId) {
+        double conversionRate = analyticsService.getPromotionConversionRate(startDate, endDate, promotionId);
+        return new ConversionRateResponse(conversionRate);
+    }
+
+    @GetMapping("/purchase-conversion-rate")
+    public ConversionRateResponse getPurchaseConversionRate(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        double conversionRate = analyticsService.getPurchaseConversionRate(startDate, endDate);
+        return new ConversionRateResponse(conversionRate);
+    }
+
+    @GetMapping("/promotion-pie-chart")
+    public com.example.promonade.dto.response.analysticsdtos.PromotionPieChartResponse getPromotionPieChart(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        return analyticsService.getPromotionPieChart(startDate, endDate);
     }
 }
