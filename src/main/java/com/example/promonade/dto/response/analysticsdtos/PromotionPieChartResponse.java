@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class PromotionPieChartResponse {
-    private List<Long> promotionIds;
-    private List<Long> frequencies;
+    private String promotionName;
+    private Long frequency;
 }

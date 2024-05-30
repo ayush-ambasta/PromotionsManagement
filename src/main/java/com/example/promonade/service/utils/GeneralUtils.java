@@ -7,6 +7,7 @@ import com.example.promonade.security.jwt.JwtUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
@@ -42,5 +43,10 @@ public class GeneralUtils {
         // Construct the cron expression
         String cronExpression = String.format("%d %d %d %d %d *", second, minute, hour, dayOfMonth, month);
         return cronExpression;
+    }
+
+    public double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+        return (double) Math.round(value * Math.pow(10, places)) / Math.pow(10, places);
     }
 }

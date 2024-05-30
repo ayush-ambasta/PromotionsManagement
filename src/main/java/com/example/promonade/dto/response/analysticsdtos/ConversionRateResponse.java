@@ -7,4 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class ConversionRateResponse {
     private double conversionRate;
+    private boolean success;
 }
