@@ -36,8 +36,8 @@ public class Promotion {
 
     Boolean approved;
 
-    @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn()
+    @ManyToOne
+    @JoinColumn
     User createdBy;
 
     @OneToOne(cascade = CascadeType.ALL)

@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -51,6 +52,10 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     Team team;
+
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Promotion> promotions;
 
     @CreationTimestamp
     Date createAt;
