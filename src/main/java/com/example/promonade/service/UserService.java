@@ -118,6 +118,7 @@ public class UserService {
         if(!userTeam.equals(ownerTeam)){
             throw new TeamNotAuthorisedException(String.format("The owner team %s cannot delete %s user team!", ownerTeam, userTeam));
         }
+
         userRepository.delete(user);
 
         return new UpdationResponse(String.format("Successfully deleted user %s", username), true);

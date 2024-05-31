@@ -41,7 +41,7 @@ public class Purchase {
 
     double amountSpent;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     Promotion promotionUsed;
 
 }
