@@ -30,7 +30,11 @@ public class AnalyticsService {
 
 
     public double getRevenueGenerated(Date startDate, Date endDate) {
-        return purchaseRepository.sumRevenueInPeriod(startDate, endDate);
+        Object revenue = purchaseRepository.sumRevenueInPeriod(startDate, endDate);
+        if(revenue==null) {
+            return 0.0;
+        }
+        return (double) revenue;
     }
 
     public double getRevenueGeneratedWithPromotion(Date startDate, Date endDate, Long promotionId) {
@@ -109,7 +113,11 @@ public class AnalyticsService {
     }
 
     public double getPromotionPurchaseConversionRate(Date startDate, Date endDate, Long promotionId) {
-        long totalLogins = behaviourRepository.countLoginsInPeriod(startDate, endDate);
+        Object logins = behaviourRepository.countLoginsInPeriod(startDate, endDate);
+        if(logins==null) {
+            return 0.0;
+        }
+        double totalLogins = (double) logins;
         long promotionPurchases = purchaseRepository.countPurchasesInPeriodWithPromotion(startDate, endDate, promotionId);
         double conversionRate = totalLogins == 0 ? 0 : (double) promotionPurchases / totalLogins*100;
         return generalUtils.round(conversionRate, 1);
@@ -123,7 +131,11 @@ public class AnalyticsService {
     }
 
     public double getPurchaseConversionRate(Date startDate, Date endDate) {
-        long totalLogins = behaviourRepository.countLoginsInPeriod(startDate, endDate);
+        Object logins = behaviourRepository.countLoginsInPeriod(startDate, endDate);
+        if(logins==null) {
+            return 0.0;
+        }
+        double totalLogins = (double) logins;
         long totalPurchases = purchaseRepository.countPurchasesInPeriod(startDate, endDate);
         double conversionRate = totalLogins == 0 ? 0 : (double) totalPurchases / totalLogins * 100; // Conversion rate in percentage
         return generalUtils.round(conversionRate, 1);
