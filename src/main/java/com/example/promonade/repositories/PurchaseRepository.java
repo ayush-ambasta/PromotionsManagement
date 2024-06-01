@@ -15,7 +15,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     long countPurchasesInPeriod(@Param("startDate")Date startDate, @Param("endDate")Date endDate);
 
     @Query("SELECT SUM(p.amountSpent) FROM Purchase p WHERE p.timeOfPurchase BETWEEN :startDate AND :endDate")
-    double sumRevenueInPeriod(@Param("startDate")Date startDate, @Param("endDate")Date endDate);
+    Object sumRevenueInPeriod(@Param("startDate")Date startDate, @Param("endDate")Date endDate);
 
     @Query("SELECT SUM(p.amountSpent) FROM Purchase p WHERE p.timeOfPurchase BETWEEN :startDate AND :endDate AND p.promotionUsed.id = :promotionId")
     Object sumRevenueInPeriodWithPromotion(@Param("startDate")Date startDate, @Param("endDate")Date endDate, @Param("promotionId") Long promotionId);
