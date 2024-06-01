@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.promonade.service.utils.GeneralUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+@CrossOrigin(origins = "*")
 @Service
 @AllArgsConstructor
 public class AnalyticsService {
@@ -32,7 +34,11 @@ public class AnalyticsService {
     }
 
     public double getRevenueGeneratedWithPromotion(Date startDate, Date endDate, Long promotionId) {
-        return purchaseRepository.sumRevenueInPeriodWithPromotion(startDate, endDate, promotionId);
+        Object revenue = purchaseRepository.sumRevenueInPeriodWithPromotion(startDate, endDate, promotionId);
+        if(revenue==null) {
+            return 0.0;
+        }
+        return (double) revenue;
     }
 
     public ConversionRateResponse getRevenueConversionRateWithPromotion(Date startDate, Date endDate, Long promotionId) {
