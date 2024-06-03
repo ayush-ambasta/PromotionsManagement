@@ -117,7 +117,7 @@ public class AnalyticsService {
         if(logins==null) {
             return 0.0;
         }
-        double totalLogins = (double) logins;
+        long totalLogins = (long) logins;
         long promotionPurchases = purchaseRepository.countPurchasesInPeriodWithPromotion(startDate, endDate, promotionId);
         double conversionRate = totalLogins == 0 ? 0 : (double) promotionPurchases / totalLogins*100;
         return generalUtils.round(conversionRate, 1);
@@ -135,7 +135,7 @@ public class AnalyticsService {
         if(logins==null) {
             return 0.0;
         }
-        double totalLogins = (double) logins;
+        long totalLogins = (long) logins;
         long totalPurchases = purchaseRepository.countPurchasesInPeriod(startDate, endDate);
         double conversionRate = totalLogins == 0 ? 0 : (double) totalPurchases / totalLogins * 100; // Conversion rate in percentage
         return generalUtils.round(conversionRate, 1);
