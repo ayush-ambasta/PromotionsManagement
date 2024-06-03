@@ -2,6 +2,7 @@ package com.example.promonade.security.jwt;
 
 
 import com.example.promonade.security.service.UserDetailsServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +46,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (Exception e) {
+        }catch(ExpiredJwtException e){
+//            logger.error("Cannot set user authentication: {}", e.getMessage());
+            request.setAttribute("expired", e.getMessage());
+        }
+        catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
         }
 
