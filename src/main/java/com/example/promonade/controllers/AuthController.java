@@ -8,6 +8,7 @@ import com.example.promonade.dto.response.userdtos.SignupResponse;
 import com.example.promonade.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*")
@@ -26,5 +27,11 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
         return ResponseEntity.ok(userService.registerUser(signUpRequest));
+    }
+
+    @GetMapping("/test-token")
+    @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
+    public ResponseEntity<?> testToken() {
+        return ResponseEntity.ok(true);
     }
 }
