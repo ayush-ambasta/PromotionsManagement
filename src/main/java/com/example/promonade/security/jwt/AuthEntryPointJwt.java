@@ -1,7 +1,9 @@
 package com.example.promonade.security.jwt;
 
 
+import com.example.promonade.exceptions.tokenExceptions.TokenExpiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,14 +27,24 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
             throws IOException, ServletException {
         logger.error("Unauthorized error: {}", authException.getMessage());
 
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
+        final String expiredMsg = (String) request.getAttribute("expired");
         final Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         body.put("error", "Unauthorized");
-        body.put("message", authException.getMessage());
         body.put("path", request.getServletPath());
+
+        // Check for TokenExpiredException and set custom status code
+        if (expiredMsg!=null) {
+            response.setStatus(440); // Custom status code for token expired
+            body.put("status", 440);
+            body.put("message", "SESSION_EXPIRED");
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+            body.put("message", authException.getMessage());
+
+        }
 
         final ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), body);

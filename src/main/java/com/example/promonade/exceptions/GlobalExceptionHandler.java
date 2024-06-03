@@ -10,6 +10,7 @@ import com.example.promonade.exceptions.productServiceExceptions.ServiceNotFound
 import com.example.promonade.exceptions.customerExceptions.CustomerNotFoundException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionIncompleteException;
 import com.example.promonade.exceptions.promotionExceptions.PromotionNotFoundException;
+import com.example.promonade.exceptions.tokenExceptions.TokenExpiredException;
 import com.example.promonade.exceptions.userExceptions.*;
 
 import org.slf4j.Logger;
@@ -45,6 +46,14 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .badRequest()
+                .body(new MessageResponse(ex.toString()));
+    }
+    @ExceptionHandler({TokenExpiredException.class})
+    public final ResponseEntity<?> tokenException(RuntimeException ex, WebRequest request){
+        LOGGER.error("Handling " + ex.getClass().getSimpleName() + " due to " + ex.getMessage());
+
+        return ResponseEntity
+                .status(440)
                 .body(new MessageResponse(ex.toString()));
     }
 }
