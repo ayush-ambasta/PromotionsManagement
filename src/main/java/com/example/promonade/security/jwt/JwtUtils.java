@@ -1,6 +1,7 @@
 package com.example.promonade.security.jwt;
 
 
+import com.example.promonade.exceptions.tokenExceptions.TokenExpiredException;
 import com.example.promonade.security.service.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -50,6 +51,7 @@ public class JwtUtils {
             logger.error("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
             logger.error("JWT token is expired: {}", e.getMessage());
+            throw e;
         } catch (UnsupportedJwtException e) {
             logger.error("JWT token is unsupported: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
