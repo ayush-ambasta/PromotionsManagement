@@ -1,5 +1,6 @@
 package com.example.promonade.service;
 
+import com.example.promonade.dto.request.EmailDetails;
 import com.example.promonade.dto.request.userdtos.LoginRequest;
 import com.example.promonade.dto.request.userdtos.SignupRequest;
 import com.example.promonade.dto.response.UpdationResponse;
@@ -16,6 +17,7 @@ import com.example.promonade.repositories.UserRepository;
 import com.example.promonade.security.jwt.JwtUtils;
 import com.example.promonade.security.service.UserDetailsImpl;
 import com.example.promonade.service.transformers.UserTransformer;
+import com.example.promonade.service.utils.EmailService;
 import com.example.promonade.service.utils.GeneralUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,6 +45,8 @@ public class UserService {
     private final JwtUtils jwtUtils;
 
     private final GeneralUtils generalUtils;
+
+    private final EmailService emailService;
 
     public JwtResponse authenticateUser(LoginRequest loginRequest){
         Authentication authentication = authenticationManager.authenticate(
@@ -85,6 +89,11 @@ public class UserService {
 
         //saving UserEntity to the database
         userRepository.save(user);
+
+        String emailBody = generalUtils.formulateAddUserMessage(user.getName(), user.getUsername(), signUpRequest.getPassword());
+        EmailDetails details = new EmailDetails(user.getEmail(), "Promonade Login Credentials", emailBody);
+        String status = emailService.sendMail(details);
+        System.out.println(status);
 
         return UserTransformer.userToSignupResponse(user);
     }

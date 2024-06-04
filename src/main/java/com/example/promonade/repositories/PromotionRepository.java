@@ -20,7 +20,7 @@ public interface PromotionRepository extends JpaRepository<Promotion, Integer> {
     @Query("select p from Promotion p where p.approved = true")
     List<Promotion> findApprovedPromotions();
 
-    @Query("SELECT p FROM Promotion p WHERE p.validFrom <= :endDate AND p.validTill >= :startDate AND p.active = true")
+    @Query("SELECT p FROM Promotion p WHERE p.validFrom <= :endDate AND p.validTill >= :startDate AND p.approved = true")
     List<Promotion> findActivePromotionsInPeriod(@Param("startDate")Date startDate, @Param("endDate")Date endDate);
 
 }

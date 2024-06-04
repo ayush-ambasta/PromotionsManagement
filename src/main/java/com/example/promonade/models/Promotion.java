@@ -42,7 +42,7 @@ public class Promotion {
 
     User createdBy;
 
-    @OneToOne(cascade = CascadeType.DETACH)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn
     Criteria criteria;
 
