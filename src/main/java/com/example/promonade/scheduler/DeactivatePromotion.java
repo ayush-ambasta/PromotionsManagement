@@ -36,8 +36,9 @@ public class DeactivatePromotion extends ScheduleTask implements Runnable {
         promotion.setActive(false);
         promotionRepository.save(promotion);
 
+        String subject = "Promonade - " +promotion.getName()+" Ends!";
         String emailBody = formulatePromotionEndMessage(promotion.getCreatedBy().getName(), promotion.getName());
-        EmailDetails details = new EmailDetails(promotion.getCreatedBy().getEmail(), "Promonade Login Credentials", emailBody);
+        EmailDetails details = new EmailDetails(promotion.getCreatedBy().getEmail(), subject, emailBody);
         String status = emailService.sendMail(details);
         System.out.println(status);
     }

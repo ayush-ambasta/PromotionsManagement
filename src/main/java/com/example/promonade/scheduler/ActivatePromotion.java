@@ -39,7 +39,8 @@ public class ActivatePromotion extends ScheduleTask implements Runnable{
         promotionRepository.save(promotion);
 
         String emailBody = formulatePromotionStartMessage(promotion.getCreatedBy().getName(), promotion.getName(), promotion.getValidTill());
-        EmailDetails details = new EmailDetails(promotion.getCreatedBy().getEmail(), "Promonade Login Credentials", emailBody);
+        String subject = "Promonade - " +promotion.getName()+" Begins!";
+        EmailDetails details = new EmailDetails(promotion.getCreatedBy().getEmail(), subject , emailBody);
         String status = emailService.sendMail(details);
         System.out.println(status);
     }
