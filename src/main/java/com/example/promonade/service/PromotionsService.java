@@ -18,8 +18,10 @@ import com.example.promonade.scheduler.ActivatePromotion;
 import com.example.promonade.scheduler.DeactivatePromotion;
 import com.example.promonade.scheduler.ScheduleTask;
 import com.example.promonade.service.transformers.PromotionTransformer;
+import com.example.promonade.service.utils.EmailService;
 import com.example.promonade.service.utils.GeneralUtils;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
@@ -29,11 +31,12 @@ import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PromotionsService {
     private final PromotionRepository promotionRepository;
     private final GeneralUtils generalUtils;
     private final TaskScheduler taskScheduler;
+    private final EmailService emailService;
 
     Map<Integer, ScheduledFuture<?>> jobsMap = new HashMap<>();
 
@@ -65,6 +68,8 @@ public class PromotionsService {
 
         Promotion promotion = PromotionTransformer.promotionRequestToPromotion(promotionRequest, createdBy);
 
+        promotionRepository.save(promotion);
+
         if(createdBy.getRole()==ERole.OWNER){
             promotion.setApproved(true);
             if(promotion.getValidFrom().after(Date.from(Instant.now()))) {
@@ -78,8 +83,6 @@ public class PromotionsService {
                 promotion.setActive(false);
             }
         }
-
-        promotionRepository.save(promotion);
 
         return promotion;
     }
@@ -134,7 +137,7 @@ public class PromotionsService {
         criteria.setAgeCategory(criteriaRequest.getAgeCategory());
         criteria.setGender(criteriaRequest.getGender());
         criteria.setProductType(criteriaRequest.getProductType());
-        criteriaRequest.setMaritalStatus(criteriaRequest.getMaritalStatus());
+        criteria.setMaritalStatus(criteriaRequest.getMaritalStatus());
 
         promotion.setCriteria(criteria);
 
@@ -245,8 +248,8 @@ public class PromotionsService {
         System.out.println("Scheduling task with job id: " + jobId + " and cron expression: " + cronExpression + " and promotionStart: "+ action.toString());
 
         ScheduleTask scheduleTask = action.equals(PromotionScheduleAction.ACTIVATEPROMOTION)?
-                new ActivatePromotion(action, promotion, promotionRepository):
-                new DeactivatePromotion(action, promotion, promotionRepository);
+                new ActivatePromotion(action, promotion, promotionRepository, emailService):
+                new DeactivatePromotion(action, promotion, promotionRepository, emailService);
 
         scheduledTask = taskScheduler.schedule((Runnable) scheduleTask, new CronTrigger(cronExpression, TimeZone.getTimeZone("Asia/Kolkata")));
 

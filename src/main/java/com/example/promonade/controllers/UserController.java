@@ -2,6 +2,7 @@ package com.example.promonade.controllers;
 
 import com.example.promonade.enums.userEnums.Team;
 import com.example.promonade.service.UserService;
+import com.example.promonade.service.utils.EmailService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,9 @@ public class UserController {
 
     @Autowired
     private final UserService userService;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
@@ -30,7 +34,6 @@ public class UserController {
         return ResponseEntity.ok(userService.deleteUser(username,headerAuth));
     }
 
-
     @GetMapping("/current-team-users")
     @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
     public ResponseEntity<?>getAllUserFromTeam(@RequestHeader("Authorization") String headerAuth) {
@@ -44,11 +47,10 @@ public class UserController {
         return ResponseEntity.ok(userService.deleteUserNoAuth(username));
     }
 
-
     @GetMapping("/team-users")
     @PreAuthorize("hasAuthority('OWNER') or hasAuthority('MANAGER')")
     public ResponseEntity<?>getAllUserFromTeam(@RequestParam("team") Team team) {
         return ResponseEntity.ok(userService.getAllUserFromTeam(team));
-
     }
+
 }

@@ -49,4 +49,8 @@ public class GeneralUtils {
         if (places < 0) throw new IllegalArgumentException();
         return (double) Math.round(value * Math.pow(10, places)) / Math.pow(10, places);
     }
+
+    public String formulateAddUserMessage(String receiver, String username, String password){
+        return String.format("Hi %s,\nYour login credentials are as follows\nUsername - %s\nPassword - %s", receiver, username, password);
+    }
 }
