@@ -68,7 +68,6 @@ public class PromotionsService {
 
         Promotion promotion = PromotionTransformer.promotionRequestToPromotion(promotionRequest, createdBy);
 
-        promotionRepository.save(promotion);
 
         if(createdBy.getRole()==ERole.OWNER){
             promotion.setApproved(true);
@@ -83,7 +82,7 @@ public class PromotionsService {
                 promotion.setActive(false);
             }
         }
-
+        promotionRepository.save(promotion);
         return promotion;
     }
 
